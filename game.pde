@@ -4,17 +4,15 @@ int win_width = 600;
 int win_height = 500;
 float blocks[][] = {
     {50,100,50,win_width/2, win_height/2, -100},
-    {50,100,50,win_width/2+100, win_height/2, -100},
-    {50,100,50,win_width/2+200, win_height/2, -100},
+    {50,100,50,win_width/2+100, win_height/2, -200},
+    {50,100,50,win_width/2+200, win_height/2, 0},
     {50,100,50,win_width/2-100, win_height/2, -100},
     };
 
 ArrayList <GameObject> gameobject = new ArrayList<>();
 int num = 0;
 float front = 15;
-float camera_angle[] = {0, 0};
-//float pos[] = {win_width/2, win_height/2,0};
-float pos[] = {win_width/2, win_height/2, 200};
+Player player_data = new Player(win_width/2, win_height/2, 0);
 
 void setup() {
     size(600, 500, P3D);
@@ -27,14 +25,11 @@ void setup() {
 
 void draw() {
     background(255);
-    stroke(0);
-    line(width/2-10, height/2, width/2+10, height/2);
-    line(width/2, height/2-10, width/2, height/2+10);
+
 
     pushMatrix();
-
-    camera(pos[0], pos[1], pos[2],
-        pos[0], pos[1], 0,
+    camera(player_data.x, player_data.y, player_data.z,
+        sin(player_data.direction[0])+player_data.x, player_data.y, 0,
         0, 1, 0);
 
 
@@ -43,8 +38,6 @@ void draw() {
     for (GameObject obj : gameobject) {
         obj.update();
     }
-
-
 
     noStroke();
     fill(0);
@@ -58,27 +51,42 @@ void draw() {
 
     if (keyPressed) {
         if (key=='d') {
-            pos[0] += 10;
+            player_data.x += 10;
         }
         if (key == 'a') {
-            pos[0] -= 10;
+            player_data.x -= 10;
         }
         if (key == 's') {
-            pos[2] += 10;
+            player_data.z += 10;
         }
         if (key == 'w') {
-            pos[2] -= 10;
+            player_data.z -= 10;
         }
+        if (key == 'q') {
+            player_data.direction[0] += (1/6)*PI;
+        }
+        if (key == 'e') {
+            player_data.direction[0] -= (1/6)*PI;
+        }
+
     }
     hitObject();
+
+    stroke(0);
+    line(width/2-10, height/2, width/2+10, height/2);
+    line(width/2, height/2-10, width/2, height/2+10);
 }
 
 void hitObject() {
     for (int i=0; i<gameobject.size(); i++) {
         for (int j=0; j<bullet.length; j++) {
             if (bullet[j] != null) {
-                if (abs(gameobject.get(i).x - bullet[j].x) < gameobject.get(i)._depth/2) {
-                    gameobject.remove(i);
+                if (abs(gameobject.get(i).x - bullet[j].x) < gameobject.get(i)._width/2) {
+                    if (abs(gameobject.get(i).y - bullet[j].y) < gameobject.get(i)._height/2) {
+                        if (abs(gameobject.get(i).z - bullet[j].z) < gameobject.get(i)._depth/2) {
+                            gameobject.remove(i);
+                        }
+                     }
                 }
             }
         }
@@ -86,10 +94,10 @@ void hitObject() {
 }
 
 void mousePressed() {
-    bullet[num] = new Bullet(pos[0], pos[1], pos[2]-100,0,0,5);
+    bullet[num] = new Bullet(player_data.x, player_data.y, player_data.z,0,0,10);
     num = (num+1)%length;
 }
 
 void keyReleased() {
-    key = 'q';
+    key = 't';
 }
