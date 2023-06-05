@@ -12,7 +12,7 @@ float blocks[][] = {
 ArrayList <GameObject> gameobject = new ArrayList<>();
 int num = 0;
 float front = 15;
-Player player_data = new Player(win_width/2, win_height/2, 0);
+Player player = new Player(win_width/2, win_height/2, 0);
 
 void setup() {
     size(600, 500, P3D);
@@ -28,10 +28,9 @@ void draw() {
 
 
     pushMatrix();
-    camera(player_data.x, player_data.y, player_data.z,
-        sin(player_data.direction[0])+player_data.x, player_data.y, 0,
+    camera(player.x, player.y, player.z,
+        sin(player.angle[0])+player.x, player.y, cos(player.angle[0])+player.z,
         0, 1, 0);
-
 
     fill(0, 255, 10);
 
@@ -51,22 +50,26 @@ void draw() {
 
     if (keyPressed) {
         if (key=='d') {
-            player_data.x += 10;
+            player.x -= sin(0.5*PI+player.angle[0])*10;
+            player.z -= cos(0.5*PI+player.angle[0])*10;
         }
         if (key == 'a') {
-            player_data.x -= 10;
+            player.x += sin(0.5*PI+player.angle[0])*10;
+            player.z += cos(0.5*PI+player.angle[0])*10;
         }
         if (key == 's') {
-            player_data.z += 10;
+            player.x -= sin(player.angle[0])*10;
+            player.z -= cos(player.angle[0])*10;
         }
         if (key == 'w') {
-            player_data.z -= 10;
+            player.x += sin(player.angle[0])*10;
+            player.z += cos(player.angle[0])*10;
         }
         if (key == 'q') {
-            player_data.direction[0] += (1/6)*PI;
+            player.angle[0] += 0.01*PI;
         }
         if (key == 'e') {
-            player_data.direction[0] -= (1/6)*PI;
+            player.angle[0] -= 0.01*PI;
         }
 
     }
@@ -94,8 +97,9 @@ void hitObject() {
 }
 
 void mousePressed() {
-    bullet[num] = new Bullet(player_data.x, player_data.y, player_data.z,0,0,10);
+    bullet[num] = new Bullet(player.x, player.y, player.z,sin(player.angle[0])*10,0,-cos(player.angle[0])*10);
     num = (num+1)%length;
+    println(num);
 }
 
 void keyReleased() {
