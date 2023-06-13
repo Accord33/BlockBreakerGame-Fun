@@ -8,14 +8,8 @@ Client client;
 String room = "room1";
 String user = "Staycia";
 float player_all[][] = new float[2][4];
+float deamon[] = new float[4];
 
-
-float blocks[][] = {
-    {win_width/2+100, win_height/2-50, -200, 50,100,50},
-    {win_width/2+200, win_height/2-50, 0, 50,100,50},
-    {win_width/2-100, win_height/2-50, -100, 50,100,50},
-    {win_height/2, win_height/2, 0, 10, 10, 10},
-};
 
 // 当たり判定を持つ床
 float collision_list[][] = {
@@ -47,11 +41,16 @@ float collision_list[][] = {
     {win_width/2+5910, win_height/2-700, 1855, 305, 0, 200},
     {win_width/2+5910, win_height/2-700, 2012, 305, 220, 320},
 
+    // 2階床
+    {-2000, win_height/2-920, 2332, 10150, 0, 8000},
+    {-2000, win_height/2-920, 1467, 3460, 0, 865},
+    {1775, win_height/2-920, 1467, 4730, 0, 865},
+
 };
 
 // objファイルのURL
 String worldObj_URL[] = {
-    "/Users/sakabekazuto/Documents/Blender/untitled.obj"
+    "/Users/sakabekazuto/prg/Processing/game/untitled.obj"
 };
 // objファイルから読み込んだオブジェクトの座標と角度
 float worldObj[][] = {
@@ -59,7 +58,6 @@ float worldObj[][] = {
 };
 
 // 可変長リストの作成
-ArrayList <GameObject> gameobject = new ArrayList<>();
 ArrayList <GameObject_obj> gameobject_obj = new ArrayList<>();
 ArrayList <Collision> collision = new ArrayList<>();
 
@@ -73,9 +71,6 @@ public void settings() {
 
 void setup() {
     // 可変長リストに代入
-    for (int i=0; i<blocks.length;i++) {
-        gameobject.add(new GameObject(blocks[i][0],blocks[i][1],blocks[i][2],blocks[i][3],blocks[i][4],blocks[i][5]));
-    }
     for (int i=0; i<worldObj.length; i++) {
         gameobject_obj.add(new GameObject_obj(worldObj[i][0], worldObj[i][1], worldObj[i][2], worldObj[i][3], worldObj[i][4], worldObj_URL[i]));
     }
@@ -92,9 +87,7 @@ void draw() {
     pointLight(255, 255, 255, player.x, player.y, player.z);
 
     strokeWeight(1);
-    for (GameObject obj : gameobject) {
-        obj.update();
-    }
+
     player.update();
 
     noStroke();
@@ -104,14 +97,14 @@ void draw() {
         obj.update();
     }
 
-    int a = 1;
+    int a = 0;
     for (Collision obj : collision) {
         obj.update();
         float i = obj.bounce(player.x, player.y, player.z);
-        // if (i != 0) {
-        //     player.y = i;
-        //     a++;
-        // }
+        if (i != 0) {
+            player.y = i;
+            a++;
+        }
     }
 
     if (a==0) {
@@ -171,6 +164,7 @@ void draw() {
     otherplayer();
 }
 
+// キーが押されたら配列の特定の場所をTrueにする
 void keyPressed() {
     if (key == ' ') {
         keycodes[0] = true;
@@ -183,6 +177,7 @@ void keyPressed() {
     }
 }
 
+// キーが離されたら特定の場所をFalseにする
 void keyReleased() {
     if (key == ' ') {
         keycodes[0] = false;
@@ -195,36 +190,48 @@ void keyReleased() {
     }
 }
 
+// サーバーから受信したデータを座標として見る
 void clientEvent(Client c) {
     String s = c.readString();
-    if (s!=null) {
         // println(s);
-        
+
+    if (s!=null) {
+        // 文字列データをjsonデータに書き直してプレイヤーの座標に合わせる プレイヤー側
         JSONObject jsobject = parseJSONObject(s);
         JSONObject room = jsobject.getJSONObject("room1");
         JSONArray jsarray = room.getJSONArray("player");
 
         for (int i=0; i<jsarray.size(); i++) {
             String name = jsarray.getString(i, "*");
-            // println(name);
             JSONArray a = room.getJSONArray(jsarray.getString(i, "*"));
             float x = a.getFloat(0);
             float y = a.getFloat(1);
             float z = a.getFloat(2);
             float angle1 = a.getFloat(3);
-            // print(x);
-            // print(" ");
-            // print(y);
-            // print(" ");
-            // println(z);
             player_all[i][0] = x;
             player_all[i][1] = y;
             player_all[i][2] = z;
             player_all[i][3] = angle1;
         }
+
+        // 鬼側
+        String name = room.getString("deamon");
+        // println(name);
+        JSONArray a = room.getJSONArray(name);
+
+        float x = a.getFloat(0);
+        println(x);
+        float y = a.getFloat(1);
+        float z = a.getFloat(2);
+        float angle1 = a.getFloat(3);
+        deamon[0] = x;
+        deamon[1] = y;
+        deamon[2] = z;
+        deamon[3] = angle1;
     }
 }
 
+// プレイヤーのアバターを表示する
 void otherplayer() {
     for (int i=0; i<player_all.length;i++) {
         pushMatrix();
@@ -234,10 +241,16 @@ void otherplayer() {
         // print(" ");
         // println(player_all[i][2]);
         translate(player_all[i][0], player_all[i][1]-130, player_all[i][2]);
-        fill(255, 0, 0);
+        fill(0, 0, 255);
         rotateY(player_all[i][3]);
-        println(player_all[i][3]);
         box(50);
         popMatrix();
     }
+
+    pushMatrix();
+    translate(deamon[0], deamon[1]-130, deamon[2]);
+    fill(255, 0, 0);
+    rotateY(deamon[3]);
+    box(50);
+    popMatrix();
 }
