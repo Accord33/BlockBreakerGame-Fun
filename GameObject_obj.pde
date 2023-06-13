@@ -1,3 +1,4 @@
+// objファイルから持ってきたオブジェクトのクラス
 class GameObject_obj {
     float x, y, z, angle1, angle2;
     String url;
