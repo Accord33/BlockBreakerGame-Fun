@@ -1,6 +1,6 @@
 class GameObject {
     float x, y, z, _width, _height, _depth;
-    GameObject (float _width, float _height, float _depth, float x, float y, float z) {
+    GameObject (float x, float y, float z, float _width, float _height, float _depth) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -10,7 +10,7 @@ class GameObject {
     }
     void update() {
         pushMatrix();
-        translate(x, y, z);
+        translate(this.x, this.y, this.z);
         box(this._width, this._height, this._depth);
         popMatrix();
     }
