@@ -7,7 +7,7 @@ boolean keycodes[] = new boolean[2];
 Client client;
 String room = "room1";
 String user = "Staycia";
-float player_all[][] = new float[2][3];
+float player_all[][] = new float[2][4];
 
 
 float blocks[][] = {
@@ -167,7 +167,7 @@ void draw() {
     // println(player.z);
 
 
-    client.write(room+","+user+","+str(player.x)+","+str(player.y)+","+str(player.z));
+    client.write(room+","+user+","+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]);
     otherplayer();
 }
 
@@ -211,6 +211,7 @@ void clientEvent(Client c) {
             float x = a.getFloat(0);
             float y = a.getFloat(1);
             float z = a.getFloat(2);
+            float angle1 = a.getFloat(3);
             // print(x);
             // print(" ");
             // print(y);
@@ -219,6 +220,7 @@ void clientEvent(Client c) {
             player_all[i][0] = x;
             player_all[i][1] = y;
             player_all[i][2] = z;
+            player_all[i][3] = angle1;
         }
     }
 }
@@ -233,6 +235,8 @@ void otherplayer() {
         // println(player_all[i][2]);
         translate(player_all[i][0], player_all[i][1]-130, player_all[i][2]);
         fill(255, 0, 0);
+        rotateY(player_all[i][3]);
+        println(player_all[i][3]);
         box(50);
         popMatrix();
     }
