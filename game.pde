@@ -5,6 +5,9 @@ float g = 1;
 boolean key_list[] = new boolean[26];
 boolean keycodes[] = new boolean[2];
 Client client;
+String room = "room1";
+String user = "Staycia";
+float player_all[][] = new float[2][3];
 
 
 float blocks[][] = {
@@ -101,14 +104,14 @@ void draw() {
         obj.update();
     }
 
-    int a = 0;
+    int a = 1;
     for (Collision obj : collision) {
         obj.update();
         float i = obj.bounce(player.x, player.y, player.z);
-        if (i != 0) {
-            player.y = i;
-            a++;
-        }
+        // if (i != 0) {
+        //     player.y = i;
+        //     a++;
+        // }
     }
 
     if (a==0) {
@@ -164,7 +167,8 @@ void draw() {
     // println(player.z);
 
 
-    client.write(str(player.x)+","+str(player.y)+","+str(player.z));
+    client.write(room+","+user+","+str(player.x)+","+str(player.y)+","+str(player.z));
+    otherplayer();
 }
 
 void keyPressed() {
@@ -188,5 +192,48 @@ void keyReleased() {
     }
     if (key-'a'>=-1 && key-'a'<26){
         key_list[key-'a'] = false;
+    }
+}
+
+void clientEvent(Client c) {
+    String s = c.readString();
+    if (s!=null) {
+        // println(s);
+        
+        JSONObject jsobject = parseJSONObject(s);
+        JSONObject room = jsobject.getJSONObject("room1");
+        JSONArray jsarray = room.getJSONArray("player");
+
+        for (int i=0; i<jsarray.size(); i++) {
+            String name = jsarray.getString(i, "*");
+            // println(name);
+            JSONArray a = room.getJSONArray(jsarray.getString(i, "*"));
+            float x = a.getFloat(0);
+            float y = a.getFloat(1);
+            float z = a.getFloat(2);
+            // print(x);
+            // print(" ");
+            // print(y);
+            // print(" ");
+            // println(z);
+            player_all[i][0] = x;
+            player_all[i][1] = y;
+            player_all[i][2] = z;
+        }
+    }
+}
+
+void otherplayer() {
+    for (int i=0; i<player_all.length;i++) {
+        pushMatrix();
+        // print(player_all[i][0]);
+        // print(" ");
+        // print(player_all[i][1]);
+        // print(" ");
+        // println(player_all[i][2]);
+        translate(player_all[i][0], player_all[i][1]-130, player_all[i][2]);
+        fill(255, 0, 0);
+        box(50);
+        popMatrix();
     }
 }
