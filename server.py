@@ -2,6 +2,7 @@
 import socket
 import threading
 import json
+import random
 
 HOST = ''                 # Symbolic name meaning all available interfaces
 PORT = 5007              # Arbitrary non-privileged port
@@ -18,29 +19,22 @@ def re(conn, addr):
     while True:
         data = conn.recv(1024)
         if not data: break
-        data = data.decode('utf-8').split(",")
+        print(data)
+        data = json.loads(data.decode('utf-8'))
         # 送信されるデータ
         # ルーム名 ユーザー名 プレイヤーステータス x y z angle0 鍵の数
         # もしルームがなければ生成
-        print(data)
-        if data[0] not in datas:
-            datas[data[0]] = dict()
-        # もしplayer要素がなければ生成
-        if "player" not in datas[data[0]]:
-            datas[data[0]]["player"] = list()
-        # もしユーザーがプレイヤーリストに入っていなければ追加 ただし5人以下
-        if data[1] not in datas[data[0]]["player"] and len(datas[data[0]]["player"]) <= 4 and data[2]=="player":
-            datas[data[0]]["player"].append(data[1])
-        # もし鬼リストがなければ生成
-        if "deamon" not in datas[data[0]]:
-            datas[data[0]]["deamon"] = ""
-        # もしユーザーが鬼リストに入っていなければ追加 ただし1人以下
-        if data[1] not in datas[data[0]]["deamon"] and len(datas[data[0]]["deamon"]) <= 1 and data[2]=="deamon":
-            datas[data[0]]["deamon"] = data[1]
-
-        datas[data[0]][data[1]] = list(map(float, [data[3],data[4],data[5], data[6]]))
-        datas[data[0]]["key"] = int(data[7])
-
+        if data["room"] not in datas:
+            datas[data["room"]] = {"player":list(),"deamon":"","key":0,"clearPlayernum":0,"breakblock":[0,0,0,0],"worldID":random.randint(0,0)}
+        if data["userstatus"] == "player" and data["user"] not in datas[data["room"]]["player"] and len(datas[data["room"]]["player"]) < 5:
+            datas[data["room"]]["player"].append(data["user"])
+        if data["userstatus"] == "deamon" and  data["user"] != datas[data["room"]]["deamon"] and datas[data["room"]]["deamon"] == "":
+            datas[data["room"]]["deamon"] = data["user"]
+        datas[data["room"]][data["user"]] = data["pos"]
+        if datas[data["room"]]["key"] < data["key"]:
+            datas[data["room"]]["key"] = data["key"]
+        if datas[data["room"]]["breakblock"] < data["breakblock"]:
+            datas[data["room"]]["breakblock"] = data["breakblock"]
         
         print(datas)
         conn.send(json.dumps(datas).encode('utf-8'))

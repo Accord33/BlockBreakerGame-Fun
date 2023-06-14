@@ -1,4 +1,6 @@
 import processing.net.*;
+
+
 int win_width = 1200;
 int win_height = 800;
 boolean key_list[] = new boolean[26];
@@ -11,68 +13,73 @@ float player_all[][] = new float[2][4];
 float deamon[] = new float[4];
 int gamestatus = 0;
 Start start = new Start();
+String IP = "127.0.0.1";
+int PORT = 5007;
 
 // 破壊可能ブロック座標
-float breakblock[][] = {
+float breakblock[][][] = {{
     {600, 400-130, 0},
     {-1682,-210,2726},
     {3575,-210,648},
     {4428,-650,5568}
-    };
+}};
 
 // 破壊メーター
 float breakmeter = 0;
 // 破壊スピード
 float breakspeed = 1;
 // 鍵の数
-int key_num;
-
+int key_num = 0;
+// 鍵のステータスリスト
+int blockstatus[] = new int[4];
+// 鍵の場所リスト
+int blockplace = 0;
 
 
 // 当たり判定を持つ床
 float collision_list[][] = {
     // 一階床
-    {-2000, win_height/2, -2350, 10150, 0, 4000},
+    {-2000, 400, -2350, 10150, 0, 4000},
 
     // 一階階段右
-    {win_width/2+870, win_height/2, 248, 305, 220, 355},
-    {win_width/2+870, win_height/2-220, 603, 305, 0, 200},
-    {win_width/2+870, win_height/2-220, 760, 305, 260, 355},
+    {600+870, 400, 248, 305, 220, 355},
+    {600+870, 400-220, 603, 305, 0, 200},
+    {600+870, 400-220, 760, 305, 260, 355},
 
     // 一階階段左
-    {win_width/2+5910, win_height/2, 248, 305, 220, 355},
-    {win_width/2+5910, win_height/2-220, 603, 305, 0, 200},
-    {win_width/2+5910, win_height/2-220, 760, 305, 260, 355},
+    {600+5910, 400, 248, 305, 220, 355},
+    {600+5910, 400-220, 603, 305, 0, 200},
+    {600+5910, 400-220, 760, 305, 260, 355},
 
     // 2階床
-    {-2000, win_height/2-480, 1120, 10150, 0, 1750},
-    {-2000, win_height/2-480, 180, 3460, 0, 940},
-    {1775, win_height/2-480, 180, 4730, 0, 940},
+    {-2000, 400-480, 1120, 10150, 0, 1750},
+    {-2000, 400-480, 180, 3460, 0, 940},
+    {1775, 400-480, 180, 4730, 0, 940},
 
     // 2階階段右
-    {win_width/2+870, win_height/2-480, 1500, 305, 220, 355},
-    {win_width/2+870, win_height/2-700, 1855, 305, 0, 200},
-    {win_width/2+870, win_height/2-700, 2012, 305, 220, 320},
+    {600+870, 400-480, 1500, 305, 220, 355},
+    {600+870, 400-700, 1855, 305, 0, 200},
+    {600+870, 400-700, 2012, 305, 220, 320},
 
     // 2階階段左
-    {win_width/2+5910, win_height/2-480, 1500, 305, 220, 355},
-    {win_width/2+5910, win_height/2-700, 1855, 305, 0, 200},
-    {win_width/2+5910, win_height/2-700, 2012, 305, 220, 320},
+    {600+5910, 400-480, 1500, 305, 220, 355},
+    {600+5910, 400-700, 1855, 305, 0, 200},
+    {600+5910, 400-700, 2012, 305, 220, 320},
 
     // 2階床
-    {-2000, win_height/2-920, 2332, 10150, 0, 8000},
-    {-2000, win_height/2-920, 1467, 3460, 0, 865},
-    {1775, win_height/2-920, 1467, 4730, 0, 865},
+    {-2000, 400-920, 2332, 10150, 0, 8000},
+    {-2000, 400-920, 1467, 3460, 0, 865},
+    {1775, 400-920, 1467, 4730, 0, 865},
 
 };
 
 // 壁
 float wallcollision_list[][] = {
-    {-2000, win_height/2, -2350, 10150, 600, 10}
+    {-2000, 400, -2350, 10150, 600, 10}
 };
 
 // ゴール座標
-float goal[] = {win_width/2-500, win_height/2, -50};
+float goal[] = {600-500, 400, -50};
 
 // objファイルのURL
 String worldObj_URL[] = {
@@ -80,7 +87,7 @@ String worldObj_URL[] = {
 };
 // objファイルから読み込んだオブジェクトの座標と角度
 float worldObj[][] = {
-    {win_width/2, win_height/2, 0, 0, 0, 0}
+    {600, 400, 0, 0, 0, 0}
 };
 
 // 可変長リストの作成
@@ -91,7 +98,7 @@ ArrayList <AreaCollision> wallcollition = new ArrayList<>();
 // AreaCollision goalarea = new AreaCollision();
 
 // プレイヤークラスを宣言
-Player player = new Player(win_width/2, win_height/2, 0);
+Player player = new Player(600, 400, 0);
 
 // 使う文字のUnicode ID
 int charactor[] = {'a'-'a','s'-'a','w'-'a','d'-'a'};
@@ -112,7 +119,7 @@ void setup() {
     for (int i=0; i<wallcollision_list.length;i++) {
         wallcollition.add(new AreaCollision(wallcollision_list[i][0], wallcollision_list[i][1], wallcollision_list[i][2], wallcollision_list[i][3], wallcollision_list[i][4], wallcollision_list[i][5]));
     }
-    client = new Client(this, "10.124.49.230", 5007);
+    client = new Client(this, IP, PORT);
 }
 
 void draw() {
@@ -127,6 +134,7 @@ void draw() {
 }
 
 void update() {
+
     background(255);
 
     fill(0, 255, 10);
@@ -180,21 +188,24 @@ void update() {
 
     // 破壊可能ブロックの生成
     stroke(0,255,255);
-    for (int i=0; i<breakblock.length;i++) {
-        createBreakBlock(breakblock[i][0],breakblock[i][1],breakblock[i][2]);
+    for (int i=0; i<breakblock[blockplace].length;i++) {
+        if (blockstatus[i] == 1){
+            breakblock[blockplace][i][1] = 1000;
+        }
+        createBreakBlock(breakblock[blockplace][i][0],breakblock[blockplace][i][1],breakblock[blockplace][i][2]);
 
         // SPACEキーを押している間に破壊　ただし一度でも動くと最初から
-        if (dist(breakblock[i][0],breakblock[i][1],breakblock[i][2],player.x,player.y,player.z) < 300) {
+        if (dist(breakblock[blockplace][i][0],breakblock[blockplace][i][1],breakblock[blockplace][i][2],player.x,player.y,player.z) < 300) {
             // println("めっちゃ近いよ！！！");
             if (keycodes[0]==true) {
                 breakmeter += breakspeed;
                 println(breakmeter);
             }
             if (breakmeter >= 300) {
-                breakblock[i][1] = 1000;
                 key_num++;
                 println(key_num+"本目の鍵を取得しました！！！");
                 breakmeter = 0;
+                blockstatus[i] = 1;
             }
         }
     }
@@ -219,7 +230,9 @@ void update() {
 
     // データをサーバーに送信
     // 送信するデータをjsonにしたい...
-    client.write(room+","+user+","+userstatus+","+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+","+key_num);
+    // client.write(room+","+user+","+userstatus+","+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+","+key_num);
+    client.write("{\"room\":\""+room+"\",\"user\":\""+user+"\",\"userstatus\":\""+userstatus+"\",\"pos\":["+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+"],\"key\":"+key_num+",\"breakblock\":["+blockstatus[0]+","+blockstatus[1]+","+blockstatus[2]+","+blockstatus[3]+"]}");
+    
     // プレイヤーを描画
     otherplayer();
 }
@@ -306,7 +319,6 @@ void keyReleased() {
 // サーバーから受信したデータを座標として見る
 void clientEvent(Client c) {
     String s = c.readString();
-        // println(s);
 
     if (s!=null) {
         // 文字列データをjsonデータに書き直してプレイヤーの座標に合わせる プレイヤー側
@@ -350,8 +362,14 @@ void clientEvent(Client c) {
 
         // 鍵の数
         key_num = room.getInt("key");
-        // println(key_num);
+        println(key_num);
         }
+        JSONArray blockstatus_list = room.getJSONArray("breakblock");
+        for (int i=0;i<4;i++) {
+            blockstatus[i] = blockstatus_list.getInt(i);
+        }
+        blockplace = room.getInt("worldID");
+
     }
 }
 
