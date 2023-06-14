@@ -5,8 +5,8 @@ boolean key_list[] = new boolean[26];
 boolean keycodes[] = new boolean[2];
 Client client;
 String room = "room1";
-String user = "Staycia";
-String userstatus = "deamon";
+String user = "a";
+String userstatus = "player";
 float player_all[][] = new float[2][4];
 float deamon[] = new float[4];
 int gamestatus = 0;
@@ -76,7 +76,7 @@ float goal[] = {win_width/2-500, win_height/2, -50};
 
 // objファイルのURL
 String worldObj_URL[] = {
-    "/Users/sakabekazuto/prg/Processing/game/untitled.obj"
+    "./untitled.obj"
 };
 // objファイルから読み込んだオブジェクトの座標と角度
 float worldObj[][] = {
@@ -112,7 +112,7 @@ void setup() {
     for (int i=0; i<wallcollision_list.length;i++) {
         wallcollition.add(new AreaCollision(wallcollision_list[i][0], wallcollision_list[i][1], wallcollision_list[i][2], wallcollision_list[i][3], wallcollision_list[i][4], wallcollision_list[i][5]));
     }
-    client = new Client(this, "127.0.0.1", 5007);
+    client = new Client(this, "10.124.49.230", 5007);
 }
 
 void draw() {
@@ -187,10 +187,10 @@ void update() {
         if (dist(breakblock[i][0],breakblock[i][1],breakblock[i][2],player.x,player.y,player.z) < 300) {
             // println("めっちゃ近いよ！！！");
             if (keycodes[0]==true) {
-                println(key_num);
                 breakmeter += breakspeed;
+                println(breakmeter);
             }
-            if (breakmeter >= 500) {
+            if (breakmeter >= 300) {
                 breakblock[i][1] = 1000;
                 key_num++;
                 println(key_num+"本目の鍵を取得しました！！！");
@@ -350,7 +350,7 @@ void clientEvent(Client c) {
 
         // 鍵の数
         key_num = room.getInt("key");
-        println(key_num);
+        // println(key_num);
         }
     }
 }
