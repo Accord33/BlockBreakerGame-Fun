@@ -1,14 +1,22 @@
 import processing.net.*;
 int win_width = 1200;
 int win_height = 800;
-float g = 1;
 boolean key_list[] = new boolean[26];
 boolean keycodes[] = new boolean[2];
 Client client;
 String room = "room1";
-String user = "Staycia";
+String user = "a";
 float player_all[][] = new float[2][4];
 float deamon[] = new float[4];
+int gamestatus = 0;
+Start start = new Start();
+float breakblock[][] = {
+    {win_width/2, win_height/2-130, 0},
+    {-1682,-210,2726},
+    {3575,-210,648},
+    {4428,-650,5568}
+    };
+
 
 
 // 当たり判定を持つ床
@@ -27,7 +35,7 @@ float collision_list[][] = {
     {win_width/2+5910, win_height/2-220, 760, 305, 260, 355},
 
     // 2階床
-    {-2000, win_height/2-480, 1120, 10150, 0, 1600},
+    {-2000, win_height/2-480, 1120, 10150, 0, 1750},
     {-2000, win_height/2-480, 180, 3460, 0, 940},
     {1775, win_height/2-480, 180, 4730, 0, 940},
 
@@ -48,6 +56,11 @@ float collision_list[][] = {
 
 };
 
+// 壁
+float wallcollision_list[][] = {
+    {-2000, win_height/2, -2350, 10150, 600, 10}
+};
+
 // objファイルのURL
 String worldObj_URL[] = {
     "/Users/sakabekazuto/prg/Processing/game/untitled.obj"
@@ -60,9 +73,13 @@ float worldObj[][] = {
 // 可変長リストの作成
 ArrayList <GameObject_obj> gameobject_obj = new ArrayList<>();
 ArrayList <Collision> collision = new ArrayList<>();
+ArrayList <WallCollision> wallcollition = new ArrayList<>();
 
 // プレイヤークラスを宣言
 Player player = new Player(win_width/2, win_height/2, 0);
+
+// 使う文字のUnicode ID
+int charactor[] = {'a'-'a','s'-'a','w'-'a','d'-'a'};
 
 // 画面サイズを変数で宣言する時はsetting関数を使わなければいけない
 public void settings() {
@@ -77,10 +94,24 @@ void setup() {
     for (int i=0; i<collision_list.length; i++) {
         collision.add(new Collision(collision_list[i][0], collision_list[i][1], collision_list[i][2], collision_list[i][3], collision_list[i][4], collision_list[i][5]));
     }
-    client = new Client(this, "127.0.0.1", 5007); 
+    for (int i=0; i<wallcollision_list.length;i++) {
+        wallcollition.add(new WallCollision(wallcollision_list[i][0], wallcollision_list[i][1], wallcollision_list[i][2], wallcollision_list[i][3], wallcollision_list[i][4], wallcollision_list[i][5]));
+    }
+    client = new Client(this, "127.0.0.1", 5007);
 }
 
 void draw() {
+    switch (gamestatus) {
+        case 0:
+            start.draw();
+            break;
+        case 1:
+            update();
+            break;
+    }
+}
+
+void update() {
     background(255);
 
     fill(0, 255, 10);
@@ -93,11 +124,15 @@ void draw() {
     noStroke();
     fill(0);
 
-    for (GameObject_obj obj : gameobject_obj) {
-        obj.update();
-    }
+    // // ワールド描画
+    // for (GameObject_obj obj : gameobject_obj) {
+    //     obj.update();
+    // }
 
+    // 1にすると重力がなくなる
     int a = 0;
+
+    // 床の当たり判定を生成
     for (Collision obj : collision) {
         obj.update();
         float i = obj.bounce(player.x, player.y, player.z);
@@ -107,10 +142,57 @@ void draw() {
         }
     }
 
+    move();
+
+    // 壁の当たり判定
+    for (WallCollision obj : wallcollition) {
+        obj.update();
+        // println(obj.hit(player.x, player.y, player.z));
+        if (obj.hit(player.x, player.y, player.z)) {
+            for (int i=0;i<charactor.length;i++) {
+                key_list[charactor[i]] = !key_list[charactor[i]];
+                // println(key_list[charactor[i]]);
+            }
+            while (obj.hit(player.x, player.y, player.z)) {
+                move();
+            }
+            for (int i=0;i<charactor.length;i++) {
+                key_list[charactor[i]] = !key_list[charactor[i]];
+            }
+        }
+    }
+
+    // 破壊可能ブロックの生成
+    stroke(0,255,255);
+    for (int i=0; i<breakblock.length;i++) {
+        createBreakBlock(breakblock[i][0],breakblock[i][1],breakblock[i][2]);
+    }
+
     if (a==0) {
         player.freeFall();
     }
 
+
+    stroke(0);
+    strokeWeight(0.5);
+    for (int i=0; i<110; i++) {
+        line(width/2+i*100-5000, height/2, -5000, width/2+i*100-5000, height/2, 5000);
+        line(width/2-5000, height/2, -5000+i*100, width/2+5000, height/2, -5000+i*100);
+    }
+
+    // print(player.x);
+    // print(" ");
+    // print(player.y);
+    // print(" ");
+    // println(player.z);
+
+
+    client.write(room+","+user+","+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]);
+    otherplayer();
+}
+
+void move() {
+    // 入力されているキーを移動量に変換
     if (key_list['d'-'a']==true) {
         player.x -= sin(0.5*PI+player.angle[0])*10;
         player.z -= cos(0.5*PI+player.angle[0])*10;
@@ -145,35 +227,27 @@ void draw() {
     if (keycodes[1]==true) {
         player.y += 10;
     }
-
-    stroke(0);
-    strokeWeight(0.5);
-    for (int i=0; i<110; i++) {
-        line(width/2+i*100-5000, height/2, -5000, width/2+i*100-5000, height/2, 5000);
-        line(width/2-5000, height/2, -5000+i*100, width/2+5000, height/2, -5000+i*100);
-    }
-
-    // print(player.x);
-    // print(" ");
-    // print(player.y);
-    // print(" ");
-    // println(player.z);
-
-
-    client.write(room+","+user+","+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]);
-    otherplayer();
 }
 
 // キーが押されたら配列の特定の場所をTrueにする
 void keyPressed() {
-    if (key == ' ') {
-        keycodes[0] = true;
-    }
-    if (keyCode == SHIFT) {
-        keycodes[1] = true;
-    }
-    if (key-'a'>=-1 && key-'a'<26){
-    key_list[key-'a'] = true;
+    switch (gamestatus) {
+        case 0:
+            if (keyCode == ENTER) {
+                gamestatus++;
+            }
+            break;	
+        case 1:
+            if (key == ' ') {
+                keycodes[0] = true;
+            }
+            if (keyCode == SHIFT) {
+                keycodes[1] = true;
+            }
+            if (key-'a'>=-1 && key-'a'<26){
+            key_list[key-'a'] = true;
+            }
+            break;
     }
 }
 
@@ -220,7 +294,6 @@ void clientEvent(Client c) {
         JSONArray a = room.getJSONArray(name);
 
         float x = a.getFloat(0);
-        println(x);
         float y = a.getFloat(1);
         float z = a.getFloat(2);
         float angle1 = a.getFloat(3);

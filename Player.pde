@@ -14,7 +14,6 @@ class Player {
             sin(this.angle[0])+this.x, this.y-130+sin(this.angle[1]), cos(this.angle[0])+this.z,
             0, 1, 0);
     }
-    
     void freeFall() {
         this.y += 10;
     }

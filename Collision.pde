@@ -58,7 +58,6 @@ class Collision {
     float bounce(float tx, float ty, float tz) {
         if (this.x <= tx && tx <= this.x+_width) {
             if (this.z <= tz && tz <= this.z+_depth) {
-
                 // float child = abs(this.a*(tx-_width) + this.b*(ty+_height) + this.c*(tz-_depth) + this.d);
                 float child = abs(this.a*tx + this.b*ty + this.c*tz + this.d);
                 float mothor = sqrt(this.a*this.a + this.b*this.b + this.c*this.c);
