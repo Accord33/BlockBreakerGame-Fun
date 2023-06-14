@@ -5,17 +5,27 @@ boolean key_list[] = new boolean[26];
 boolean keycodes[] = new boolean[2];
 Client client;
 String room = "room1";
-String user = "a";
+String user = "Staycia";
+String userstatus = "deamon";
 float player_all[][] = new float[2][4];
 float deamon[] = new float[4];
 int gamestatus = 0;
 Start start = new Start();
+
+// 破壊可能ブロック座標
 float breakblock[][] = {
-    {win_width/2, win_height/2-130, 0},
+    {600, 400-130, 0},
     {-1682,-210,2726},
     {3575,-210,648},
     {4428,-650,5568}
     };
+
+// 破壊メーター
+float breakmeter = 0;
+// 破壊スピード
+float breakspeed = 1;
+// 鍵の数
+int key_num;
 
 
 
@@ -61,6 +71,9 @@ float wallcollision_list[][] = {
     {-2000, win_height/2, -2350, 10150, 600, 10}
 };
 
+// ゴール座標
+float goal[] = {win_width/2-500, win_height/2, -50};
+
 // objファイルのURL
 String worldObj_URL[] = {
     "/Users/sakabekazuto/prg/Processing/game/untitled.obj"
@@ -73,7 +86,9 @@ float worldObj[][] = {
 // 可変長リストの作成
 ArrayList <GameObject_obj> gameobject_obj = new ArrayList<>();
 ArrayList <Collision> collision = new ArrayList<>();
-ArrayList <WallCollision> wallcollition = new ArrayList<>();
+ArrayList <AreaCollision> wallcollition = new ArrayList<>();
+
+// AreaCollision goalarea = new AreaCollision();
 
 // プレイヤークラスを宣言
 Player player = new Player(win_width/2, win_height/2, 0);
@@ -95,7 +110,7 @@ void setup() {
         collision.add(new Collision(collision_list[i][0], collision_list[i][1], collision_list[i][2], collision_list[i][3], collision_list[i][4], collision_list[i][5]));
     }
     for (int i=0; i<wallcollision_list.length;i++) {
-        wallcollition.add(new WallCollision(wallcollision_list[i][0], wallcollision_list[i][1], wallcollision_list[i][2], wallcollision_list[i][3], wallcollision_list[i][4], wallcollision_list[i][5]));
+        wallcollition.add(new AreaCollision(wallcollision_list[i][0], wallcollision_list[i][1], wallcollision_list[i][2], wallcollision_list[i][3], wallcollision_list[i][4], wallcollision_list[i][5]));
     }
     client = new Client(this, "127.0.0.1", 5007);
 }
@@ -124,10 +139,10 @@ void update() {
     noStroke();
     fill(0);
 
-    // // ワールド描画
-    // for (GameObject_obj obj : gameobject_obj) {
-    //     obj.update();
-    // }
+    // ワールド描画
+    for (GameObject_obj obj : gameobject_obj) {
+        obj.update();
+    }
 
     // 1にすると重力がなくなる
     int a = 0;
@@ -142,10 +157,11 @@ void update() {
         }
     }
 
+    // キー入力にあたる移動
     move();
 
     // 壁の当たり判定
-    for (WallCollision obj : wallcollition) {
+    for (AreaCollision obj : wallcollition) {
         obj.update();
         // println(obj.hit(player.x, player.y, player.z));
         if (obj.hit(player.x, player.y, player.z)) {
@@ -166,6 +182,21 @@ void update() {
     stroke(0,255,255);
     for (int i=0; i<breakblock.length;i++) {
         createBreakBlock(breakblock[i][0],breakblock[i][1],breakblock[i][2]);
+
+        // SPACEキーを押している間に破壊　ただし一度でも動くと最初から
+        if (dist(breakblock[i][0],breakblock[i][1],breakblock[i][2],player.x,player.y,player.z) < 300) {
+            // println("めっちゃ近いよ！！！");
+            if (keycodes[0]==true) {
+                println(key_num);
+                breakmeter += breakspeed;
+            }
+            if (breakmeter >= 500) {
+                breakblock[i][1] = 1000;
+                key_num++;
+                println(key_num+"本目の鍵を取得しました！！！");
+                breakmeter = 0;
+            }
+        }
     }
 
     if (a==0) {
@@ -186,8 +217,10 @@ void update() {
     // print(" ");
     // println(player.z);
 
-
-    client.write(room+","+user+","+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]);
+    // データをサーバーに送信
+    // 送信するデータをjsonにしたい...
+    client.write(room+","+user+","+userstatus+","+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+","+key_num);
+    // プレイヤーを描画
     otherplayer();
 }
 
@@ -196,18 +229,24 @@ void move() {
     if (key_list['d'-'a']==true) {
         player.x -= sin(0.5*PI+player.angle[0])*10;
         player.z -= cos(0.5*PI+player.angle[0])*10;
+        breakmeter = 0;
+
     }
     if (key_list['a'-'a']==true) {
-            player.x += sin(0.5*PI+player.angle[0])*10;
-            player.z += cos(0.5*PI+player.angle[0])*10;
+        player.x += sin(0.5*PI+player.angle[0])*10;
+        player.z += cos(0.5*PI+player.angle[0])*10;
+        breakmeter = 0;
+
     }
     if (key_list['s'-'a']==true) {
-            player.x -= sin(player.angle[0])*10;
-            player.z -= cos(player.angle[0])*10;
+        player.x -= sin(player.angle[0])*10;
+        player.z -= cos(player.angle[0])*10;
+        breakmeter = 0;
     }
     if (key_list['w'-'a']==true) {
-            player.x += sin(player.angle[0])*10;
-            player.z += cos(player.angle[0])*10;
+        player.x += sin(player.angle[0])*10;
+        player.z += cos(player.angle[0])*10;
+        breakmeter = 0;
     }
     if (key_list['q'-'a']==true) {
         player.angle[0] += 0.01*PI;
@@ -245,7 +284,7 @@ void keyPressed() {
                 keycodes[1] = true;
             }
             if (key-'a'>=-1 && key-'a'<26){
-            key_list[key-'a'] = true;
+                key_list[key-'a'] = true;
             }
             break;
     }
@@ -286,11 +325,18 @@ void clientEvent(Client c) {
             player_all[i][1] = y;
             player_all[i][2] = z;
             player_all[i][3] = angle1;
+        
+            // print(x);
+            // print(" ");
+            // print(y);
+            // print(" ");
+            // println(z);
         }
 
         // 鬼側
         String name = room.getString("deamon");
         // println(name);
+        if (name != "") {
         JSONArray a = room.getJSONArray(name);
 
         float x = a.getFloat(0);
@@ -301,6 +347,11 @@ void clientEvent(Client c) {
         deamon[1] = y;
         deamon[2] = z;
         deamon[3] = angle1;
+
+        // 鍵の数
+        key_num = room.getInt("key");
+        println(key_num);
+        }
     }
 }
 

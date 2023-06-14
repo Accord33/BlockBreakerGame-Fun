@@ -1,6 +1,6 @@
-class WallCollision {
+class AreaCollision {
     float x, y, z, _width, _height, _depth;
-    WallCollision(float x, float y, float z, float _width, float _height, float _depth) {
+    AreaCollision(float x, float y, float z, float _width, float _height, float _depth) {
         this.x = x;
         this.y = y;
         this.z = z;

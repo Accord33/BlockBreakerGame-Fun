@@ -1,0 +1,14 @@
+{
+    "room":{
+        "player":["aa"],
+        "Pcharactor":["unitychan"],
+        "aa":[0,0,0],
+        "deamon":"bbb",
+        "Dchatactor":["deamon1"],
+        "bbb":[0,0,0],
+        "key":0,
+        "worldID":"random 0-3 int型",
+        "breakbrock":[0,0,0,0,0],
+        "clearPlayernum":0
+    }
+}
