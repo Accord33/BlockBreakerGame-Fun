@@ -14,7 +14,7 @@ int gamestatus = 2;
 Start start = new Start();
 Home home = new Home();
 EndGame end = new EndGame();
-String IP = "10.124.49.230";
+String IP = "127.0.0.1";
 int PORT = 5007;
 UI ui = new UI();
 
@@ -94,6 +94,7 @@ float goal[] = {7947, -520.0, 5830, 250, 200, 250};
 // objファイルのURL
 String worldObj_URL[] = {
     "./untitled.obj"
+    
 };
 // objファイルから読み込んだオブジェクトの座標と角度
 float worldObj[][] = {
@@ -135,6 +136,7 @@ void setup() {
     client = new Client(this, IP, PORT);
     PFont font = createFont("Meiryo", 50);
     textFont(font);
+    ch = loadShape("model/misaki_sum.obj");
 }
 
 void draw() {
@@ -197,21 +199,21 @@ void update() {
     // キー入力にあたる移動
     move();
 
-    // 壁の当たり判定
-    for (AreaCollision obj : wallcollition) {
-        obj.update();
-        if (obj.hit(player.x, player.y, player.z)) {
-            for (int i=0;i<charactor.length;i++) {
-                key_list[charactor[i]] = !key_list[charactor[i]];
-            }
-            while (obj.hit(player.x, player.y, player.z)) {
-                move();
-            }
-            for (int i=0;i<charactor.length;i++) {
-                key_list[charactor[i]] = !key_list[charactor[i]];
-            }
-        }
-    }
+    // // 壁の当たり判定
+    // for (AreaCollision obj : wallcollition) {
+    //     obj.update();
+    //     if (obj.hit(player.x, player.y, player.z)) {
+    //         for (int i=0;i<charactor.length;i++) {
+    //             key_list[charactor[i]] = !key_list[charactor[i]];
+    //         }
+    //         while (obj.hit(player.x, player.y, player.z)) {
+    //             move();
+    //         }
+    //         for (int i=0;i<charactor.length;i++) {
+    //             key_list[charactor[i]] = !key_list[charactor[i]];
+    //         }
+    //     }
+    // }
 
     // 破壊可能ブロックの生成
     stroke(0,255,255);
