@@ -6,11 +6,11 @@ boolean key_list[] = new boolean[26];
 boolean keycodes[] = new boolean[2];
 Client client;
 String roomID = "room3";
-String user = "a";
+String user = "ayuyu";
 String userstatus = "player";
 float player_all[][] = new float[2][4];
 float deamon[] = new float[4];
-int gamestatus = 0;
+int gamestatus = 2;
 Start start = new Start();
 Home home = new Home();
 EndGame end = new EndGame();
@@ -36,6 +36,8 @@ int key_num = 0;
 int blockstatus[] = new int[4];
 // 鍵の場所リスト
 int blockplace = 0;
+// 移動速度
+int move_speed = 10;
 
 
 // 当たり判定を持つ床
@@ -68,7 +70,7 @@ float collision_list[][] = {
     {600+5910, 400-700, 1855, 305, 0, 200},
     {600+5910, 400-700, 2012, 305, 220, 320},
 
-    // 2階床
+    // 3階床
     {-2000, 400-920, 2332, 10150, 0, 8000},
     {-2000, 400-920, 1467, 3460, 0, 865},
     {1775, 400-920, 1467, 4730, 0, 865},
@@ -77,7 +79,13 @@ float collision_list[][] = {
 
 // 壁
 float wallcollision_list[][] = {
-    {-2000, 400, -2350, 10150, 600, 10}
+    {-2000, 400, -2350, 10150, 10, 10},
+    {-1920, 400, -2350, 10, 10, 4000},
+
+    {-1810, 400, 250, 2420, 10, 1130},
+    {770, 400, 250, 700, 470, 1130},
+
+    {-2000, -80, 190, 10000, 10, 10}
 };
 
 // ゴール座標
@@ -166,7 +174,7 @@ void update() {
     }
 
     // 1にすると重力がなくなる
-    int a = 1;
+    int a =0;
 
     // 床の当たり判定を生成
     for (Collision obj : collision) {
@@ -234,12 +242,12 @@ void update() {
     }
 
 
-    stroke(0);
-    strokeWeight(0.5);
-    for (int i=0; i<110; i++) {
-        line(width/2+i*100-5000, height/2, -5000, width/2+i*100-5000, height/2, 5000);
-        line(width/2-5000, height/2, -5000+i*100, width/2+5000, height/2, -5000+i*100);
-    }
+    // stroke(0);
+    // strokeWeight(0.5);
+    // for (int i=0; i<110; i++) {
+    //     line(width/2+i*100-5000, height/2, -5000, width/2+i*100-5000, height/2, 5000);
+    //     line(width/2-5000, height/2, -5000+i*100, width/2+5000, height/2, -5000+i*100);
+    // }
 
     // print(player.x);
     // print(" ");
@@ -261,25 +269,25 @@ void update() {
 void move() {
     // 入力されているキーを移動量に変換
     if (key_list['d'-'a']==true) {
-        player.x -= sin(0.5*PI+player.angle[0])*10;
-        player.z -= cos(0.5*PI+player.angle[0])*10;
+        player.x -= sin(0.5*PI+player.angle[0])*move_speed;
+        player.z -= cos(0.5*PI+player.angle[0])*move_speed;
         breakmeter = 0;
 
     }
     if (key_list['a'-'a']==true) {
-        player.x += sin(0.5*PI+player.angle[0])*10;
-        player.z += cos(0.5*PI+player.angle[0])*10;
+        player.x += sin(0.5*PI+player.angle[0])*move_speed;
+        player.z += cos(0.5*PI+player.angle[0])*move_speed;
         breakmeter = 0;
 
     }
     if (key_list['s'-'a']==true) {
-        player.x -= sin(player.angle[0])*10;
-        player.z -= cos(player.angle[0])*10;
+        player.x -= sin(player.angle[0])*move_speed;
+        player.z -= cos(player.angle[0])*move_speed;
         breakmeter = 0;
     }
     if (key_list['w'-'a']==true) {
-        player.x += sin(player.angle[0])*10;
-        player.z += cos(player.angle[0])*10;
+        player.x += sin(player.angle[0])*move_speed;
+        player.z += cos(player.angle[0])*move_speed;
         breakmeter = 0;
     }
     if (key_list['q'-'a']==true) {
@@ -341,6 +349,13 @@ void keyReleased() {
                 key_list[key-'a'] = false;
             }
             break;
+    }
+}
+
+void mousePressed() {
+    switch (gamestatus) {
+        case 1:
+            home.mousePressed();
     }
 }
 

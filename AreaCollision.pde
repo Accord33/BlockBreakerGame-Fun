@@ -18,6 +18,7 @@ class AreaCollision {
         popMatrix();
     }
 
+    // 壁の当たり判定の中にいるかどうか
     boolean hit(float tx, float ty, float tz) {
         if (this.x <= tx && tx <= this.x+_width) {
             if (this.z <= tz && tz <= this.z+_depth) {
