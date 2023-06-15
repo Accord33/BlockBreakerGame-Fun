@@ -37,7 +37,7 @@ def re(conn, addr):
             datas[data["room"]]["breakblock"] = data["breakblock"]
         
         print(datas)
-        conn.send(json.dumps(datas).encode('utf-8'))
+        conn.send(json.dumps(datas[data["room"]]).encode('utf-8'))
 
 while True:
     try:

@@ -6,21 +6,20 @@ boolean key_list[] = new boolean[26];
 boolean keycodes[] = new boolean[2];
 Client client;
 String roomID = "room3";
-String user = "a";
+String user = "b";
 String userstatus = "player";
 float player_all[][] = new float[2][4];
 float deamon[] = new float[4];
 int gamestatus = 0;
 Start start = new Start();
-Home home = new Home();
 EndGame end = new EndGame();
-String IP = "10.124.49.230";
+String IP = "127.0.0.1";
 int PORT = 5007;
 UI ui = new UI();
 
 // 破壊可能ブロック座標
 float breakblock[][][] = {{
-    {200, 270, -500},
+    {600, 400-130, 0},
     {-1682,-210,2726},
     {3575,-210,648},
     {4428,-650,5568}
@@ -81,7 +80,7 @@ float wallcollision_list[][] = {
 };
 
 // ゴール座標
-float goal[] = {7947, -520.0, 5830, 250, 200, 250};
+float goal[] = {600-500, 400, -50, 100, 100, 100};
 
 // objファイルのURL
 String worldObj_URL[] = {
@@ -112,8 +111,6 @@ public void settings() {
 }
 
 void setup() {
-    // 画面サイズ変更可
-    surface.setResizable( true );
     // 可変長リストに代入
     for (int i=0; i<worldObj.length; i++) {
         gameobject_obj.add(new GameObject_obj(worldObj[i][0], worldObj[i][1], worldObj[i][2], worldObj[i][3], worldObj[i][4], worldObj_URL[i]));
@@ -135,12 +132,9 @@ void draw() {
             start.draw();
             break;
         case 1:
-            home.draw();
-            break;
-        case 2:
             update();
             break;
-        case 3:
+        case 2:
             end.draw();
             break;
     }
@@ -166,7 +160,7 @@ void update() {
     }
 
     // 1にすると重力がなくなる
-    int a = 1;
+    int a = 0;
 
     // 床の当たり判定を生成
     for (Collision obj : collision) {
@@ -192,9 +186,11 @@ void update() {
     // 壁の当たり判定
     for (AreaCollision obj : wallcollition) {
         obj.update();
+        // println(obj.hit(player.x, player.y, player.z));
         if (obj.hit(player.x, player.y, player.z)) {
             for (int i=0;i<charactor.length;i++) {
                 key_list[charactor[i]] = !key_list[charactor[i]];
+                // println(key_list[charactor[i]]);
             }
             while (obj.hit(player.x, player.y, player.z)) {
                 move();
@@ -311,9 +307,6 @@ void keyPressed() {
             }
             break;	
         case 1:
-            home.keyPressed();
-            break;
-        case 2:
             if (key == ' ') {
                 keycodes[0] = true;
             }
@@ -329,18 +322,14 @@ void keyPressed() {
 
 // キーが離されたら特定の場所をFalseにする
 void keyReleased() {
-    switch (gamestatus) {
-        case 2:
-            if (key == ' ') {
-                keycodes[0] = false;
-            }
-            if (keyCode == SHIFT) {
-                keycodes[1] = false;
-            }
-            if (key-'a'>=-1 && key-'a'<26){
-                key_list[key-'a'] = false;
-            }
-            break;
+    if (key == ' ') {
+        keycodes[0] = false;
+    }
+    if (keyCode == SHIFT) {
+        keycodes[1] = false;
+    }
+    if (key-'a'>=-1 && key-'a'<26){
+        key_list[key-'a'] = false;
     }
 }
 
@@ -390,7 +379,7 @@ void clientEvent(Client c) {
         }
         // 鍵の数
         key_num = room.getInt("key");
-        // 壊したブロックの同期
+        println(key_num);
         JSONArray blockstatus_list = room.getJSONArray("breakblock");
         for (int i=0;i<4;i++) {
             blockstatus[i] = blockstatus_list.getInt(i);
