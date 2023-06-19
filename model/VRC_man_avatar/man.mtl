@@ -1,0 +1,52 @@
+# Blender 3.5.1 MTL File: 'None'
+# www.blender.org
+
+newmtl man_back_hair
+Ns 96.078415
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 9
+map_Kd /Users/sakabekazuto/prg/Processing/game/model/VRC_man_avatar/texture/man_back_hair.png
+map_d /Users/sakabekazuto/prg/Processing/game/model/VRC_man_avatar/texture/man_back_hair.png
+
+newmtl man_body
+Ns 96.078415
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 9
+map_Kd /Users/sakabekazuto/prg/Processing/game/model/VRC_man_avatar/texture/man_body.png
+map_d /Users/sakabekazuto/prg/Processing/game/model/VRC_man_avatar/texture/man_body.png
+
+newmtl man_clothes
+Ns 96.078415
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 9
+map_Kd /Users/sakabekazuto/prg/Processing/game/model/VRC_man_avatar/texture/man_clothes.png
+map_d /Users/sakabekazuto/prg/Processing/game/model/VRC_man_avatar/texture/man_clothes.png
+
+newmtl man_eyes
+Ns 96.078415
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 9
+map_Kd /Users/sakabekazuto/prg/Processing/game/model/VRC_man_avatar/texture/man_eyes.png
+map_d /Users/sakabekazuto/prg/Processing/game/model/VRC_man_avatar/texture/man_eyes.png
+
+newmtl man_front_hair
+Ns 96.078415
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 9
+map_Kd /Users/sakabekazuto/prg/Processing/game/model/VRC_man_avatar/texture/man_front_hair.png
+map_d /Users/sakabekazuto/prg/Processing/game/model/VRC_man_avatar/texture/man_front_hair.png

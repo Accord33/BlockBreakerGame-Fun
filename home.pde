@@ -13,7 +13,6 @@ class Home {
         rect(width/4*2, height/5-60, 500, 80);
         text("プレイヤー名", width/4, height/5*2, 0);
         rect(width/4*2, height/5*2-60, 500, 80);
-        println("c");
 
         text("キャラクター選択", width/2, height/11*6);
 

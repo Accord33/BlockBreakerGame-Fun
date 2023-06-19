@@ -8,6 +8,7 @@ Client client;
 String roomID = "room1";
 String user = "booooo";
 String userstatus = "player";
+String avatar_data = "normal";
 float player_all[][] = new float[2][4];
 float deamon[] = new float[4];
 int gamestatus = 0;
@@ -112,6 +113,7 @@ float worldObj[][] = {
 ArrayList <GameObject_obj> gameobject_obj = new ArrayList<>();
 ArrayList <Collision> collision = new ArrayList<>();
 ArrayList <AreaCollision> wallcollition = new ArrayList<>();
+ArrayList <Avatar_obj> avatar = new ArrayList<>();
 
 // ゴールエリアの生成
 AreaCollision goalarea = new AreaCollision(goal[0],goal[1],goal[2],goal[3],goal[4],goal[5]);
@@ -183,16 +185,16 @@ void update() {
     }
 
     // 1にすると重力がなくなる
-    int a =1;
+    int a = 0;
 
     // 床の当たり判定を生成
     for (Collision obj : collision) {
-        // obj.update();
-        // float i = obj.bounce(player.x, player.y, player.z);
-        // if (i != 0) {
-        //     player.y = i;
-        //     a++;
-        // }
+        obj.update();
+        float i = obj.bounce(player.x, player.y, player.z);
+        if (i != 0) {
+            player.y = i;
+            a++;
+        }
     }
 
     goalarea.update();
@@ -250,24 +252,10 @@ void update() {
         player.freeFall();
     }
 
-
-    // stroke(0);
-    // strokeWeight(0.5);
-    // for (int i=0; i<110; i++) {
-    //     line(width/2+i*100-5000, height/2, -5000, width/2+i*100-5000, height/2, 5000);
-    //     line(width/2-5000, height/2, -5000+i*100, width/2+5000, height/2, -5000+i*100);
-    // }
-
-    // print(player.x);
-    // print(" ");
-    // print(player.y);
-    // print(" ");
-    // println(player.z);
-
     // データをサーバーに送信
     // 送信するデータをjsonにしたい...
     // client.write(room+","+user+","+userstatus+","+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+","+key_num);
-    client.write("{\"room\":\""+roomID+"\",\"user\":\""+user+"\",\"userstatus\":\""+userstatus+"\",\"pos\":["+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+"],\"key\":"+key_num+",\"breakblock\":["+blockstatus[0]+","+blockstatus[1]+","+blockstatus[2]+","+blockstatus[3]+"]}");
+    client.write("{\"room\":\""+roomID+"\",\"user\":\""+user+"\",\"userstatus\":\""+userstatus+"\",\"pos\":["+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+"],\"key\":"+key_num+",\"breakblock\":["+blockstatus[0]+","+blockstatus[1]+","+blockstatus[2]+","+blockstatus[3]+"],\"avatar\":\""+avatar_data+"\"}");
     
     // プレイヤーを描画
     otherplayer();
@@ -413,6 +401,7 @@ void clientEvent(Client c) {
                 player_pos[i][0] = x;
                 player_pos[i][1] = y;
                 player_pos[i][2] = z;
+
             }
 
             // 鬼側
@@ -438,6 +427,13 @@ void clientEvent(Client c) {
                 blockstatus[i] = blockstatus_list.getInt(i);
             }
             blockplace = room.getInt("worldID");
+
+            // プレイヤーのアバターを取得
+            JSONArray avatar_list = room.getJSONArray("Pcharactor");
+            for (int i=0; i<(avatar_list.size() - avatar.size()); i++) {
+                println(i);
+                avatar.add(new Avatar_obj(avatar_dic(avatar_list.getString(i, "*"))));
+            }
         }
 
     }
@@ -446,17 +442,16 @@ void clientEvent(Client c) {
 // プレイヤーのアバターを表示する
 void otherplayer() {
     for (int i=0; i<player_all.length;i++) {
-        pushMatrix();
-        // print(player_all[i][0]);
-        // print(" ");
-        // print(player_all[i][1]);
-        // print(" ");
-        // println(player_all[i][2]);
-        translate(player_all[i][0], player_all[i][1]-130, player_all[i][2]);
-        fill(0, 0, 255);
-        rotateY(player_all[i][3]);
-        box(50);
-        popMatrix();
+        // pushMatrix();
+        // translate(player_all[i][0], player_all[i][1]-130, player_all[i][2]);
+        // fill(0, 0, 255);
+        // rotateY(player_all[i][3]);
+        // box(50);
+        // popMatrix();
+        println(i);
+        if (!(i >= avatar.size())) {
+            avatar.get(i).update(player_all[i][0], player_all[i][1]-130, player_all[i][2], player_all[i][3]);
+        }
     }
 
     pushMatrix();
@@ -465,4 +460,13 @@ void otherplayer() {
     rotateY(deamon[3]);
     box(50);
     popMatrix();
+}
+
+String avatar_dic(String name) {
+    if (name.equals("normal")) {
+        return "model/VRC_man_avatar/man.obj";
+    }
+    else {
+        return "None";
+    }
 }

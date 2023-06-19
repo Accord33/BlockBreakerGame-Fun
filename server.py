@@ -9,8 +9,8 @@ d = ""
 HOST = ''                 # Symbolic name meaning all available interfaces
 PORT = 5007              # Arbitrary non-privileged port
 datas = {
-
 }
+
     
 # {
 #     "room":{
@@ -56,7 +56,7 @@ def re(conn, addr):
                 datas[data["room"]] = {"player":list(),"deamon":"","key":0,"clearPlayernum":0,"breakblock":[0,0,0,0],"worldID":random.randint(0,0),"Pcharactor":list(),"Dcharactor":""}
             if data["userstatus"] == "player" and data["user"] not in datas[data["room"]]["player"] and len(datas[data["room"]]["player"]) < 5:
                 datas[data["room"]]["player"].append(data["user"])
-                # datas[data["room"]]["Pcharactor"].append(data["charactor"])
+                datas[data["room"]]["Pcharactor"].append(data["avatar"])
             if data["userstatus"] == "deamon" and  data["user"] != datas[data["room"]]["deamon"] and datas[data["room"]]["deamon"] == "":
                 datas[data["room"]]["deamon"] = data["user"]
             datas[data["room"]][data["user"]] = data["pos"]
@@ -65,6 +65,7 @@ def re(conn, addr):
             if datas[data["room"]]["breakblock"] < data["breakblock"]:
                 datas[data["room"]]["breakblock"] = data["breakblock"]
             
+            print(datas)
             conn.send(json.dumps(datas[data["room"]]).encode('utf-8'))
 
 while True:
