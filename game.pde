@@ -5,23 +5,27 @@ int win_height = 800;
 boolean key_list[] = new boolean[26];
 boolean keycodes[] = new boolean[2];
 Client client;
-String roomID = "room3";
-String user = "ayuyu";
+String roomID = "room1";
+String user = "booooo";
 String userstatus = "player";
 float player_all[][] = new float[2][4];
 float deamon[] = new float[4];
-int gamestatus = 2;
+int gamestatus = 0;
+int charactorID = 0;
 Start start = new Start();
 Home home = new Home();
 EndGame end = new EndGame();
 String IP = "127.0.0.1";
 int PORT = 5007;
 UI ui = new UI();
+float player_pos[][] = new float[2][3];
+PImage img;
+
 
 // 破壊可能ブロック座標
 float breakblock[][][] = {{
     {200, 270, -500},
-    {-1682,-210,2726},
+    {359,-520.0-130,2283},
     {3575,-210,648},
     {4428,-650,5568}
 }};
@@ -29,7 +33,7 @@ float breakblock[][][] = {{
 // 破壊メーター
 float breakmeter = 0;
 // 破壊スピード
-float breakspeed = 1;
+float breakspeed = 5;
 // 鍵の数
 int key_num = 0;
 // 鍵のステータスリスト
@@ -37,7 +41,10 @@ int blockstatus[] = new int[4];
 // 鍵の場所リスト
 int blockplace = 0;
 // 移動速度
-int move_speed = 10;
+int move_speed = 15;
+// ダメージ
+int damage = 0;
+int cooltime = 0;
 
 
 // 当たり判定を持つ床
@@ -136,7 +143,7 @@ void setup() {
     client = new Client(this, IP, PORT);
     PFont font = createFont("Meiryo", 50);
     textFont(font);
-    ch = loadShape("model/misaki_sum.obj");
+    img = loadImage("picture.png");
 }
 
 void draw() {
@@ -176,16 +183,16 @@ void update() {
     }
 
     // 1にすると重力がなくなる
-    int a =0;
+    int a =1;
 
     // 床の当たり判定を生成
     for (Collision obj : collision) {
-        obj.update();
-        float i = obj.bounce(player.x, player.y, player.z);
-        if (i != 0) {
-            player.y = i;
-            a++;
-        }
+        // obj.update();
+        // float i = obj.bounce(player.x, player.y, player.z);
+        // if (i != 0) {
+        //     player.y = i;
+        //     a++;
+        // }
     }
 
     goalarea.update();
@@ -199,21 +206,21 @@ void update() {
     // キー入力にあたる移動
     move();
 
-    // // 壁の当たり判定
-    // for (AreaCollision obj : wallcollition) {
-    //     obj.update();
-    //     if (obj.hit(player.x, player.y, player.z)) {
-    //         for (int i=0;i<charactor.length;i++) {
-    //             key_list[charactor[i]] = !key_list[charactor[i]];
-    //         }
-    //         while (obj.hit(player.x, player.y, player.z)) {
-    //             move();
-    //         }
-    //         for (int i=0;i<charactor.length;i++) {
-    //             key_list[charactor[i]] = !key_list[charactor[i]];
-    //         }
-    //     }
-    // }
+    // 壁の当たり判定
+    for (AreaCollision obj : wallcollition) {
+        obj.update();
+        if (obj.hit(player.x, player.y, player.z)) {
+            for (int i=0;i<charactor.length;i++) {
+                key_list[charactor[i]] = !key_list[charactor[i]];
+            }
+            while (obj.hit(player.x, player.y, player.z)) {
+                move();
+            }
+            for (int i=0;i<charactor.length;i++) {
+                key_list[charactor[i]] = !key_list[charactor[i]];
+            }
+        }
+    }
 
     // 破壊可能ブロックの生成
     stroke(0,255,255);
@@ -347,6 +354,14 @@ void keyReleased() {
             if (keyCode == SHIFT) {
                 keycodes[1] = false;
             }
+            if (key == 'k') {
+                for (int i=0;i<player_pos.length;i++) {
+                    if (dist(player_pos[i][0],player_pos[i][1],player_pos[i][2],player.x,player.y,player.z) > 10) {
+                        println("damage,"+","+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
+                        client.write("damage"+","+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
+                    }
+                }
+            }
             if (key-'a'>=-1 && key-'a'<26){
                 key_list[key-'a'] = false;
             }
@@ -358,6 +373,9 @@ void mousePressed() {
     switch (gamestatus) {
         case 1:
             home.mousePressed();
+            break;
+        case 3:
+            gamestatus = 0;
     }
 }
 
@@ -366,53 +384,61 @@ void clientEvent(Client c) {
     String s = c.readString();
 
     if (s!=null) {
-        // 文字列データをjsonデータに書き直してプレイヤーの座標に合わせる プレイヤー側
-        JSONObject room = parseJSONObject(s);
-        // JSONObject room = jsobject.getJSONObject(roomID);
-        JSONArray jsarray = room.getJSONArray("player");
-
-        for (int i=0; i<jsarray.size(); i++) {
-            String name = jsarray.getString(i, "*");
-            JSONArray a = room.getJSONArray(jsarray.getString(i, "*"));
-            float x = a.getFloat(0);
-            float y = a.getFloat(1);
-            float z = a.getFloat(2);
-            float angle1 = a.getFloat(3);
-            player_all[i][0] = x;
-            player_all[i][1] = y;
-            player_all[i][2] = z;
-            player_all[i][3] = angle1;
-        
-            // print(x);
-            // print(" ");
-            // print(y);
-            // print(" ");
-            // println(z);
+        if (s=="damage") {
+            gamestatus++;
         }
+        else {
+            // 文字列データをjsonデータに書き直してプレイヤーの座標に合わせる プレイヤー側
+            JSONObject room = parseJSONObject(s);
+            // JSONObject room = jsobject.getJSONObject(roomID);
+            JSONArray jsarray = room.getJSONArray("player");
 
-        // 鬼側
-        String name = room.getString("deamon");
-        // println(name);
-        if (name != "") {
-        JSONArray a = room.getJSONArray(name);
+            for (int i=0; i<jsarray.size(); i++) {
+                String name = jsarray.getString(i, "*");
+                JSONArray a = room.getJSONArray(jsarray.getString(i, "*"));
+                float x = a.getFloat(0);
+                float y = a.getFloat(1);
+                float z = a.getFloat(2);
+                float angle1 = a.getFloat(3);
+                player_all[i][0] = x;
+                player_all[i][1] = y;
+                player_all[i][2] = z;
+                player_all[i][3] = angle1;
+            
+                // print(x);
+                // print(" ");
+                // print(y);
+                // print(" ");
+                // println(z);
+                player_pos[i][0] = x;
+                player_pos[i][1] = y;
+                player_pos[i][2] = z;
+            }
 
-        float x = a.getFloat(0);
-        float y = a.getFloat(1);
-        float z = a.getFloat(2);
-        float angle1 = a.getFloat(3);
-        deamon[0] = x;
-        deamon[1] = y;
-        deamon[2] = z;
-        deamon[3] = angle1;
+            // 鬼側
+            String name = room.getString("deamon");
+            // println(name);
+            if (name != "") {
+                JSONArray a = room.getJSONArray(name);
+
+                float x = a.getFloat(0);
+                float y = a.getFloat(1);
+                float z = a.getFloat(2);
+                float angle1 = a.getFloat(3);
+                deamon[0] = x;
+                deamon[1] = y;
+                deamon[2] = z;
+                deamon[3] = angle1;
+            }
+            // 鍵の数
+            key_num = room.getInt("key");
+            // 壊したブロックの同期
+            JSONArray blockstatus_list = room.getJSONArray("breakblock");
+            for (int i=0;i<4;i++) {
+                blockstatus[i] = blockstatus_list.getInt(i);
+            }
+            blockplace = room.getInt("worldID");
         }
-        // 鍵の数
-        key_num = room.getInt("key");
-        // 壊したブロックの同期
-        JSONArray blockstatus_list = room.getJSONArray("breakblock");
-        for (int i=0;i<4;i++) {
-            blockstatus[i] = blockstatus_list.getInt(i);
-        }
-        blockplace = room.getInt("worldID");
 
     }
 }

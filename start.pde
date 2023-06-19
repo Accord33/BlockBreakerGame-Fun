@@ -1,11 +1,10 @@
 class Start {
-    Start() {}
-
+    Start() {
+    }
     void draw() {
         background(0);
-        textSize(100);
-        textAlign(CENTER);
-        text("Let's Play Game", win_width/2, win_height/2);
+        img.resize(width, height);
+        image(img, 0, 0);
 
         textSize(50);
         textAlign(LEFT);

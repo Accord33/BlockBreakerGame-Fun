@@ -10,12 +10,12 @@ class AreaCollision {
     }
 
     void update() {
-        stroke(255,0,0);
-        fill(255,0,0);
-        pushMatrix();
-        translate(this.x+_width/2, this.y-_height/2, this.z+_depth/2);
-        box(this._width, this._height, this._depth);
-        popMatrix();
+        // stroke(255,0,0);
+        // fill(255,0,0);
+        // pushMatrix();
+        // translate(this.x+_width/2, this.y-_height/2, this.z+_depth/2);
+        // box(this._width, this._height, this._depth);
+        // popMatrix();
     }
 
     // 壁の当たり判定の中にいるかどうか

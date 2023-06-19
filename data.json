@@ -1,7 +1,7 @@
 {
     "room":{
         "player":["aa"],
-        "Pcharactor":["unitychan"],
+        "Pcharactor":[0],
         "aa":[0,0,0],
         "deamon":"bbb",
         "Dchatactor":["deamon1"],
