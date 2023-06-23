@@ -11,7 +11,7 @@ String userstatus = "player";
 String avatar_data = "normal";
 float player_all[][] = new float[2][4];
 float deamon[] = new float[4];
-int gamestatus = 0;
+int gamestatus = 2;
 int charactorID = 0;
 Start start = new Start();
 Home home = new Home();
@@ -166,6 +166,7 @@ void draw() {
 }
 
 void update() {
+    box(10);
 
     background(255);
 
@@ -261,6 +262,7 @@ void update() {
     otherplayer();
 
     ui.update(player.x,player.y,player.z,player.angle[0]);
+    ui.progressbar(player.x,player.y,player.z,player.angle[0]);
 }
 
 void move() {
