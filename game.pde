@@ -345,8 +345,10 @@ void keyReleased() {
             if (key == 'k') {
                 for (int i=0;i<player_pos.length;i++) {
                     if (dist(player_pos[i][0],player_pos[i][1],player_pos[i][2],player.x,player.y,player.z) > 10) {
-                        println("damage,"+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
-                        client.write("damage,"+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
+                        if (player_pos[i][0] != 0 && player_pos[i][1] != 0 && player_pos[i][2] != 0) {
+                            println("damage,"+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
+                            client.write("damage,"+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
+                        }
                     }
                 }
             }
@@ -372,8 +374,10 @@ void clientEvent(Client c) {
     String s = c.readString();
 
     if (s!=null) {
-        if (s=="damage") {
+        if (s.equals("damage")) {
+            // name.equals("normal")
             gamestatus++;
+            println("damage");
         }
         else {
             // 文字列データをjsonデータに書き直してプレイヤーの座標に合わせる プレイヤー側

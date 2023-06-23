@@ -47,7 +47,6 @@ def re(conn, addr):
                 if datas[data[1]][i][:-1] == list(map(float, [data[2],data[3],data[4]])):
                     d = i
                     print(">>",d)
-                    d = ""
         else:
             data = json.loads(data)
             # 送信されるデータ
@@ -66,7 +65,12 @@ def re(conn, addr):
             if datas[data["room"]]["breakblock"] < data["breakblock"]:
                 datas[data["room"]]["breakblock"] = data["breakblock"]
             
-            print(datas)
+            # print(datas)
+            # print(data, d)
+            if data["user"] == d:
+                print('yes')
+                conn.send("damage".encode('utf-8'))
+                d = ""
             conn.send(json.dumps(datas[data["room"]]).encode('utf-8'))
 
 while True:
