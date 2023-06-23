@@ -47,6 +47,7 @@ def re(conn, addr):
                 if datas[data[1]][i][:-1] == list(map(float, [data[2],data[3],data[4]])):
                     d = i
                     print(">>",d)
+                    d = ""
         else:
             data = json.loads(data)
             # 送信されるデータ

@@ -345,8 +345,8 @@ void keyReleased() {
             if (key == 'k') {
                 for (int i=0;i<player_pos.length;i++) {
                     if (dist(player_pos[i][0],player_pos[i][1],player_pos[i][2],player.x,player.y,player.z) > 10) {
-                        println("damage,"+","+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
-                        client.write("damage"+","+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
+                        println("damage,"+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
+                        client.write("damage,"+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
                     }
                 }
             }
@@ -431,7 +431,6 @@ void clientEvent(Client c) {
             // プレイヤーのアバターを取得
             JSONArray avatar_list = room.getJSONArray("Pcharactor");
             for (int i=0; i<(avatar_list.size() - avatar.size()); i++) {
-                println(i);
                 avatar.add(new Avatar_obj(avatar_dic(avatar_list.getString(i, "*"))));
             }
         }
@@ -448,7 +447,6 @@ void otherplayer() {
         // rotateY(player_all[i][3]);
         // box(50);
         // popMatrix();
-        println(i);
         if (!(i >= avatar.size())) {
             avatar.get(i).update(player_all[i][0], player_all[i][1]-130, player_all[i][2], player_all[i][3]);
         }
