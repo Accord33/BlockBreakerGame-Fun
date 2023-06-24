@@ -28,9 +28,10 @@ class UI {
     void progressbar(float tx,float ty,float tz,float angle) {
         pushMatrix();
         noStroke();
-        translate(sin(angle)*100+tx, ty-130, cos(angle)*100+tz);
+        translate(sin(angle+radians(20))*141+tx, ty-130, cos(angle+radians(20))*141+tz);
         rotateY(angle);
-        box(breakmeter/2, 10, 10);
+        translate(-breakmeter/10, 0, 0);
+        box(breakmeter/5, 10, 1);
         popMatrix();
     }
 }

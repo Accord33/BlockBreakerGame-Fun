@@ -11,10 +11,11 @@ String userstatus = "player";
 String avatar_data = "normal";
 float player_all[][] = new float[2][4];
 float deamon[] = new float[4];
-int gamestatus = 2;
+int gamestatus = 0;
 int charactorID = 0;
 Start start = new Start();
 Home home = new Home();
+Wait waiting = new Wait();
 EndGame end = new EndGame();
 String IP = "127.0.0.1";
 int PORT = 5007;
@@ -34,7 +35,7 @@ float breakblock[][][] = {{
 // 破壊メーター
 float breakmeter = 0;
 // 破壊スピード
-float breakspeed = 5;
+float breakspeed = 1;
 // 鍵の数
 int key_num = 0;
 // 鍵のステータスリスト
@@ -42,7 +43,7 @@ int blockstatus[] = new int[4];
 // 鍵の場所リスト
 int blockplace = 0;
 // 移動速度
-int move_speed = 15;
+int move_speed = 10;
 // ダメージ
 int damage = 0;
 int cooltime = 0;
@@ -157,9 +158,12 @@ void draw() {
             home.draw();
             break;
         case 2:
-            update();
+            waiting.update();
             break;
         case 3:
+            update();
+            break;
+        case 4:
             end.draw();
             break;
     }
@@ -202,7 +206,7 @@ void update() {
     if (key_num == 4) {
         if (goalarea.hit(player.x, player.y, player.z)) {
             println("脱出しました！！！");
-            gamestatus++;
+            gamestatus=0;
         }
     }
 
@@ -240,7 +244,7 @@ void update() {
                 breakmeter += breakspeed;
                 println(breakmeter);
             }
-            if (breakmeter >= 300) {
+            if (breakmeter >= 500) {
                 key_num++;
                 println(key_num+"本目の鍵を取得しました！！！");
                 breakmeter = 0;
@@ -320,7 +324,7 @@ void keyPressed() {
         case 1:
             home.keyPressed();
             break;
-        case 2:
+        case 3:
             if (key == ' ') {
                 keycodes[0] = true;
             }
@@ -337,7 +341,7 @@ void keyPressed() {
 // キーが離されたら特定の場所をFalseにする
 void keyReleased() {
     switch (gamestatus) {
-        case 2:
+        case 3:
             if (key == ' ') {
                 keycodes[0] = false;
             }
@@ -367,7 +371,18 @@ void mousePressed() {
             home.mousePressed();
             break;
         case 3:
+            for (int i=0; i<breakblock[blockplace].length;i++) {
+                if (blockstatus[i] == 1){
+                    breakblock[blockplace][i][1] = 1000;
+                }
+                if (dist(breakblock[blockplace][i][0],breakblock[blockplace][i][1],breakblock[blockplace][i][2],player.x,player.y,player.z) < 300) {
+                    breakmeter += (breakspeed*3);
+                }
+            }
+            break;
+        case 4:
             gamestatus = 0;
+            break;
     }
 }
 
@@ -446,24 +461,26 @@ void clientEvent(Client c) {
 
 // プレイヤーのアバターを表示する
 void otherplayer() {
-    for (int i=0; i<player_all.length;i++) {
-        // pushMatrix();
-        // translate(player_all[i][0], player_all[i][1]-130, player_all[i][2]);
-        // fill(0, 0, 255);
-        // rotateY(player_all[i][3]);
-        // box(50);
-        // popMatrix();
-        if (!(i >= avatar.size())) {
-            avatar.get(i).update(player_all[i][0], player_all[i][1]-130, player_all[i][2], player_all[i][3]);
+    if (gamestatus == 3) {
+        for (int i=0; i<player_all.length;i++) {
+            // pushMatrix();
+            // translate(player_all[i][0], player_all[i][1]-130, player_all[i][2]);
+            // fill(0, 0, 255);
+            // rotateY(player_all[i][3]);
+            // box(50);
+            // popMatrix();
+            if (!(i >= avatar.size())) {
+                avatar.get(i).update(player_all[i][0], player_all[i][1]-130, player_all[i][2], player_all[i][3]);
+            }
         }
-    }
 
-    pushMatrix();
-    translate(deamon[0], deamon[1]-130, deamon[2]);
-    fill(255, 0, 0);
-    rotateY(deamon[3]);
-    box(50);
-    popMatrix();
+        pushMatrix();
+        translate(deamon[0], deamon[1]-130, deamon[2]);
+        fill(255, 0, 0);
+        rotateY(deamon[3]);
+        box(50);
+        popMatrix();
+    }
 }
 
 String avatar_dic(String name) {
