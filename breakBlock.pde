@@ -1,4 +1,6 @@
 void createBreakBlock(float x, float y, float z) {
+
+    // 破壊するブロックの生成データ
     
     fill(0, 0, 200);
 

@@ -1,6 +1,7 @@
 class Start {
     Start() {
     }
+    // スタート画面
     void draw() {
         background(0);
         img.resize(width, height);

@@ -25,6 +25,7 @@ class UI {
         popMatrix();
     }
 
+    // どれくらい破壊したかメーター
     void progressbar(float tx,float ty,float tz,float angle) {
         pushMatrix();
         noStroke();

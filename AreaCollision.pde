@@ -1,3 +1,4 @@
+// 壁の当たり判定
 class AreaCollision {
     float x, y, z, _width, _height, _depth;
     AreaCollision(float x, float y, float z, float _width, float _height, float _depth) {

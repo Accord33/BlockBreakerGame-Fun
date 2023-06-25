@@ -2,7 +2,8 @@
     "room":{
         "player":["aa"],
         "Pcharactor":[0],
-        "aa":[0,0,0],
+        "aa":[0,0,0,0],
+        "moving":[true],
         "deamon":"bbb",
         "Dchatactor":["deamon1"],
         "bbb":[0,0,0],

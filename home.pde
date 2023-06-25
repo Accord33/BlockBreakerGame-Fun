@@ -1,4 +1,6 @@
 class Home {
+
+    // ルーム名、ユーザー名、キャラクターの選択
     String input[] = {"","",""};
     int counter = 0;
     int focus = 0;

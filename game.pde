@@ -9,7 +9,7 @@ String roomID = "room1";
 String user = "booooo";
 String userstatus = "player";
 String avatar_data = "normal";
-float player_all[][] = new float[2][4];
+float player_all[][] = new float[2][5];
 float deamon[] = new float[4];
 int gamestatus = 0;
 int charactorID = 0;
@@ -102,7 +102,7 @@ float goal[] = {7947, -520.0, 5830, 250, 200, 250};
 
 // objファイルのURL
 String worldObj_URL[] = {
-    "./untitled.obj"
+    "./model/FUN/untitled.obj"
     
 };
 // objファイルから読み込んだオブジェクトの座標と角度
@@ -260,7 +260,9 @@ void update() {
     // データをサーバーに送信
     // 送信するデータをjsonにしたい...
     // client.write(room+","+user+","+userstatus+","+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+","+key_num);
-    client.write("{\"room\":\""+roomID+"\",\"user\":\""+user+"\",\"userstatus\":\""+userstatus+"\",\"pos\":["+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+"],\"key\":"+key_num+",\"breakblock\":["+blockstatus[0]+","+blockstatus[1]+","+blockstatus[2]+","+blockstatus[3]+"],\"avatar\":\""+avatar_data+"\"}");
+    int m = 0;
+    if (keyPressed) m = 1;
+    client.write("{\"room\":\""+roomID+"\",\"user\":\""+user+"\",\"userstatus\":\""+userstatus+"\",\"pos\":["+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+","+m+"],\"key\":"+key_num+",\"breakblock\":["+blockstatus[0]+","+blockstatus[1]+","+blockstatus[2]+","+blockstatus[3]+"],\"avatar\":\""+avatar_data+"\"}");
     
     // プレイヤーを描画
     otherplayer();
@@ -409,10 +411,12 @@ void clientEvent(Client c) {
                 float y = a.getFloat(1);
                 float z = a.getFloat(2);
                 float angle1 = a.getFloat(3);
+                float m = a.getFloat(4);
                 player_all[i][0] = x;
                 player_all[i][1] = y;
                 player_all[i][2] = z;
                 player_all[i][3] = angle1;
+                player_all[i][4] = m;
             
                 // print(x);
                 // print(" ");
@@ -470,7 +474,7 @@ void otherplayer() {
             // box(50);
             // popMatrix();
             if (!(i >= avatar.size())) {
-                avatar.get(i).update(player_all[i][0], player_all[i][1]-130, player_all[i][2], player_all[i][3]);
+                avatar.get(i).update(player_all[i][0], player_all[i][1]-130, player_all[i][2], player_all[i][3], int(player_all[i][4]));
             }
         }
 
@@ -485,7 +489,8 @@ void otherplayer() {
 
 String avatar_dic(String name) {
     if (name.equals("normal")) {
-        return "model/VRC_man_avatar/man.obj";
+        return "walk_man";
+        // return "model/VRC_man_avatar/walk_man1.obj";
     }
     else {
         return "None";
