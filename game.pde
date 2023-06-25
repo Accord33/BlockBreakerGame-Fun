@@ -17,7 +17,7 @@ Start start = new Start();
 Home home = new Home();
 Wait waiting = new Wait();
 EndGame end = new EndGame();
-String IP = "127.0.0.1";
+String IP = "192.168.11.24";
 int PORT = 5007;
 UI ui = new UI();
 float player_pos[][] = new float[2][3];
@@ -39,7 +39,7 @@ int blockstatus[] = new int[4];
 // 鍵の場所リスト
 int blockplace = 0;
 // 移動速度
-int move_speed = 20;
+int move_speed = 6;
 // ダメージ
 int damage = 0;
 int cooltime = 0;
