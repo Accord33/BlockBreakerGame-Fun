@@ -1,9 +1,11 @@
 import processing.net.*;
+import java.nio.charset.StandardCharsets;
+
 
 int win_width = 1200;
 int win_height = 800;
 boolean key_list[] = new boolean[26];
-boolean keycodes[] = new boolean[2];
+boolean keycodes[] = new boolean[3];
 Client client;
 String roomID = "room1";
 String user = "booo";
@@ -11,17 +13,20 @@ String userstatus = "player";
 String avatar_data = "normal";
 float player_all[][] = new float[2][5];
 float deamon[] = new float[4];
-int gamestatus = 3;
+int gamestatus = 0;
 int charactorID = 0;
 Start start = new Start();
 Home home = new Home();
 Wait waiting = new Wait();
 EndGame end = new EndGame();
+Badend badend = new Badend();
 String IP = "192.168.11.24";
 int PORT = 5007;
 UI ui = new UI();
 float player_pos[][] = new float[2][3];
+Ikabo ikabo;
 PImage img;
+PImage blood;
 
 
 // 破壊可能ブロック座標
@@ -144,6 +149,8 @@ void setup() {
     PFont font = createFont("Meiryo", 50);
     textFont(font);
     img = loadImage("picture.png");
+    blood  = loadImage("blood_w_trans.png");
+    ikabo = new Ikabo();
 }
 
 void draw() {
@@ -162,6 +169,9 @@ void draw() {
             break;
         case 4:
             end.draw();
+            break;
+        case 5:
+            badend.draw();
             break;
     }
 }
@@ -188,11 +198,11 @@ void update() {
 
     // 1にすると重力がなくなる
     int a = 0;
-    print(player.x);
-    print(" ");
-    print(player.y);
-    print(" ");
-    println(player.z);
+    // print(player.x);
+    // print(" ");
+    // print(player.y);
+    // print(" ");
+    // println(player.z);
 
     // 床の当たり判定を生成
     for (Collision obj : collision) {
@@ -271,6 +281,10 @@ void update() {
 
     ui.update(player.x,player.y,player.z,player.angle[0]);
     ui.progressbar(player.x,player.y,player.z,player.angle[0]);
+
+    if (damage == 1) { 
+        ui.blood_show(player.x,player.y,player.z,player.angle[0]);
+    }
 }
 
 void move() {
@@ -352,14 +366,15 @@ void keyReleased() {
             if (keyCode == SHIFT) {
                 keycodes[1] = false;
             }
+            // 攻撃
             if (key == 'k') {
-                println("a");
                 for (int i=0;i<player_pos.length;i++) {
-                    if (dist(player_pos[i][0],player_pos[i][1],player_pos[i][2],player.x,player.y,player.z) > 10) {
-                        print("b");
-                        if (player_pos[i][0] != 0 && player_pos[i][1] != 0 && player_pos[i][2] != 0) {
-                            println("damage,"+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
-                            client.write("damage,"+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
+                    if (userstatus == "deamon") {
+                        println("s");
+                        if (dist(player_pos[i][0],player_pos[i][1],player_pos[i][2],player.x,player.y,player.z) > 1 && dist(player_pos[i][0],player_pos[i][1],player_pos[i][2],player.x,player.y,player.z) < 500) {
+                            println("a");
+                                println("damage,"+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
+                                client.write("damage,"+roomID+","+player_pos[i][0]+","+player_pos[i][1]+","+player_pos[i][2]);
                         }
                     }
                 }
@@ -394,14 +409,18 @@ void mousePressed() {
 
 // サーバーから受信したデータを座標として見る
 void clientEvent(Client c) {
-    String s = c.readString();
+    String s="";
+    if (c != null) {
+        byte[] b = c.readBytes();
+        s = new String(b, StandardCharsets.UTF_8);
+    }
 
     if (s!=null) {
         if (s.equals("damage")) {
             damage++;            
             println("damage"+damage);
             if (damage == 2) {
-                gamestatus++;
+                gamestatus = 5;
             }
         }
         else {
@@ -484,12 +503,14 @@ void otherplayer() {
             }
         }
 
-        pushMatrix();
-        translate(deamon[0], deamon[1]-130, deamon[2]);
-        fill(255, 0, 0);
-        rotateY(deamon[3]);
-        box(50);
-        popMatrix();
+        // pushMatrix();
+        // translate(deamon[0], deamon[1]-130, deamon[2]);
+        // fill(255, 0, 0);
+        // rotateY(deamon[3]);
+        // box(50);
+        // popMatrix();
+        ikabo.update(deamon[0], deamon[1], deamon[2], deamon[3]);
+
     }
 }
 

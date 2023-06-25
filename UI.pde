@@ -35,4 +35,15 @@ class UI {
         box(breakmeter/5, 10, 1);
         popMatrix();
     }
+
+    void blood_show(float tx,float ty,float tz,float angle) {
+        pushMatrix();
+        // translate(sin(angle+radians(30))*120+tx, ty-130, cos(angle+radians(30))*120+tz);
+        translate(sin(angle-radians(45))*110+tx, ty-130, cos(angle-radians(45))*110+tz);
+        rotateY(angle);
+        blood.resize(width/8, height/8);
+        translate(0, -height/16, 0);
+        image(blood, 0, 0);
+        popMatrix();
+    }
 }

@@ -1,6 +1,6 @@
 # Blender 3.5.1
 # www.blender.org
-mtllib walk_man.mtl
+
 o pants
 v 0.018226 0.994687 0.078374
 v 0.055580 0.995032 0.074567

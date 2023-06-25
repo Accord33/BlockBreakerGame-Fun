@@ -6,7 +6,7 @@ import random
 
 d = ""
 
-HOST = ''                 # Symbolic name meaning all available interfaces
+HOST = '0.0.0.0'                 # Symbolic name meaning all available interfaces
 PORT = 5007              # Arbitrary non-privileged port
 datas = {
 }
@@ -33,22 +33,28 @@ s.bind((HOST, PORT))
 s.listen(5)
 clients = []
 
+
 def re(conn, addr):
     global d
     while True:
-        data = conn.recv(1024)
-        if not data: break
-        data = data.decode('utf-8')
+        get_data = conn.recv(1024)
+        if not get_data: break
+        get_data = get_data.decode('utf-8')
         # print(data)
-        if data.startswith("damage"):
-            data = data.split(",")
-            print(data)
-            for i in datas[data[1]]["player"]:
-                if datas[data[1]][i][:-2] == list(map(float, [data[2],data[3],data[4]])):
+        if get_data.startswith("damage"):
+            get_data = get_data.split(",")
+            print(get_data)
+            for i in datas[get_data[1]]["player"]:
+                if datas[get_data[1]][i][:-2] == list(map(float, [get_data[2],get_data[3],get_data[4]])):
                     d = i
                     print(">>",d)
         else:
-            data = json.loads(data)
+            print(get_data)
+            try:
+                data = json.loads(get_data)
+            except json.decoder.JSONDecodeError:
+                continue
+
             # 送信されるデータ
             # ルーム名 ユーザー名 プレイヤーステータス x y z angle0 鍵の数
             # もしルームがなければ生成
@@ -65,7 +71,7 @@ def re(conn, addr):
             if datas[data["room"]]["breakblock"] < data["breakblock"]:
                 datas[data["room"]]["breakblock"] = data["breakblock"]
             
-            # print(datas)
+            print(datas)
             if d != "":
                 print(d)
             # print(data, d)
@@ -73,7 +79,10 @@ def re(conn, addr):
                 print('yes')
                 conn.send("damage".encode('utf-8'))
                 d = ""
-            conn.send(json.dumps(datas[data["room"]]).encode('utf-8'))
+            
+            conn.send(bytes(json.dumps(datas[data["room"]]), 'utf-8'))
+            # conn.send(json.dumps(datas[data["room"]]).encode('utf-8'))
+
 
 while True:
     try:
