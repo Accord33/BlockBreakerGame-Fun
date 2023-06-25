@@ -42,9 +42,9 @@ def re(conn, addr):
         # print(data)
         if data.startswith("damage"):
             data = data.split(",")
-            # print(data)
+            print(data)
             for i in datas[data[1]]["player"]:
-                if datas[data[1]][i][:-1] == list(map(float, [data[2],data[3],data[4]])):
+                if datas[data[1]][i][:-2] == list(map(float, [data[2],data[3],data[4]])):
                     d = i
                     print(">>",d)
         else:
@@ -66,6 +66,8 @@ def re(conn, addr):
                 datas[data["room"]]["breakblock"] = data["breakblock"]
             
             # print(datas)
+            if d != "":
+                print(d)
             # print(data, d)
             if data["user"] == d:
                 print('yes')

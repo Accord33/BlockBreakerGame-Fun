@@ -45,13 +45,13 @@ class Collision {
     
     // 当たり判定を表示
     void update() {
-        // stroke(0, 255, 255);
+        stroke(0, 255, 255);
         // noFill();
-        // // fill(0, 255, 255);
-        // pushMatrix();
-        // translate(this.x+_width/2, this.y-_height/2, this.z+_depth/2);
-        // box(this._width, this._height, this._depth);
-        // popMatrix();
+        fill(0, 255, 255);
+        pushMatrix();
+        translate(this.x+_width/2, this.y-_height/2, this.z+_depth/2);
+        box(this._width, this._height, this._depth);
+        popMatrix();
     }
 
     // 床の上を歩くための処理
