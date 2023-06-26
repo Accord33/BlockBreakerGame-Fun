@@ -202,7 +202,7 @@ void update() {
         }
     }
     else {
-        pointLight(150, 150, 150, player.x, player.y, player.z);
+        pointLight(100, 100, 100, player.x, player.y, player.z);
     }
     
 
@@ -456,69 +456,63 @@ void clientEvent(Client c) {
         }
         else {
             // 文字列データをjsonデータに書き直してプレイヤーの座標に合わせる プレイヤー側
-            try{
-                JSONObject room = parseJSONObject(s);
-                
-                // JSONObject room = jsobject.getJSONObject(roomID);
-                JSONArray jsarray = room.getJSONArray("player");
+            JSONObject room = parseJSONObject(s);
+            // JSONObject room = jsobject.getJSONObject(roomID);
+            JSONArray jsarray = room.getJSONArray("player");
 
-                for (int i=0; i<jsarray.size(); i++) {
-                    String name = jsarray.getString(i, "*");
-                    JSONArray a = room.getJSONArray(jsarray.getString(i, "*"));
-                    float x = a.getFloat(0);
-                    float y = a.getFloat(1);
-                    float z = a.getFloat(2);
-                    float angle1 = a.getFloat(3);
-                    float m = a.getFloat(4);
-                    player_all[i][0] = x;
-                    player_all[i][1] = y;
-                    player_all[i][2] = z;
-                    player_all[i][3] = angle1;
-                    player_all[i][4] = m;
-                
-                    // print(x);
-                    // print(" ");
-                    // print(y);
-                    // print(" ");
-                    // println(z);
-                    player_pos[i][0] = x;
-                    player_pos[i][1] = y;
-                    player_pos[i][2] = z;
+            for (int i=0; i<jsarray.size(); i++) {
+                String name = jsarray.getString(i, "*");
+                JSONArray a = room.getJSONArray(jsarray.getString(i, "*"));
+                float x = a.getFloat(0);
+                float y = a.getFloat(1);
+                float z = a.getFloat(2);
+                float angle1 = a.getFloat(3);
+                float m = a.getFloat(4);
+                player_all[i][0] = x;
+                player_all[i][1] = y;
+                player_all[i][2] = z;
+                player_all[i][3] = angle1;
+                player_all[i][4] = m;
+            
+                // print(x);
+                // print(" ");
+                // print(y);
+                // print(" ");
+                // println(z);
+                player_pos[i][0] = x;
+                player_pos[i][1] = y;
+                player_pos[i][2] = z;
 
-                }
+            }
 
-                // 鬼側
-                String name = room.getString("deamon");
-                // println(name);
-                if (name != "") {
-                    JSONArray a = room.getJSONArray(name);
+            // 鬼側
+            String name = room.getString("deamon");
+            // println(name);
+            if (name != "") {
+                JSONArray a = room.getJSONArray(name);
 
-                    float x = a.getFloat(0);
-                    float y = a.getFloat(1);
-                    float z = a.getFloat(2);
-                    float angle1 = a.getFloat(3);
-                    deamon[0] = x;
-                    deamon[1] = y;
-                    deamon[2] = z;
-                    deamon[3] = angle1;
-                }
-                // 鍵の数
-                key_num = room.getInt("key");
-                // 壊したブロックの同期
-                JSONArray blockstatus_list = room.getJSONArray("breakblock");
-                for (int i=0;i<4;i++) {
-                    blockstatus[i] = blockstatus_list.getInt(i);
-                }
-                blockplace = room.getInt("worldID");
+                float x = a.getFloat(0);
+                float y = a.getFloat(1);
+                float z = a.getFloat(2);
+                float angle1 = a.getFloat(3);
+                deamon[0] = x;
+                deamon[1] = y;
+                deamon[2] = z;
+                deamon[3] = angle1;
+            }
+            // 鍵の数
+            key_num = room.getInt("key");
+            // 壊したブロックの同期
+            JSONArray blockstatus_list = room.getJSONArray("breakblock");
+            for (int i=0;i<4;i++) {
+                blockstatus[i] = blockstatus_list.getInt(i);
+            }
+            blockplace = room.getInt("worldID");
 
-                // プレイヤーのアバターを取得
-                JSONArray avatar_list = room.getJSONArray("Pcharactor");
-                for (int i=0; i<(avatar_list.size() - avatar.size()); i++) {
-                    avatar.add(new Avatar_obj(avatar_dic(avatar_list.getString(i, "*"))));
-                }
-                
-            }catch (Exception e) {
-                return;
+            // プレイヤーのアバターを取得
+            JSONArray avatar_list = room.getJSONArray("Pcharactor");
+            for (int i=0; i<(avatar_list.size() - avatar.size()); i++) {
+                avatar.add(new Avatar_obj(avatar_dic(avatar_list.getString(i, "*"))));
             }
         }
 

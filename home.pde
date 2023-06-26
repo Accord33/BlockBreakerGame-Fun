@@ -77,10 +77,12 @@ class Home {
             if (width/15*2 < mouseX && mouseX < width/15*3) {
                 println("deamon");
                 userstatus = "deamon";
+                move_speed = 10;
             }
             else if (width/15*9 < mouseX && mouseX < width/15*10) {
                 println("player");
                 userstatus = "player";
+                move_speed = 6;
             }
         }rect(width/5*2, height/5*4, width/5, 80);
         if (width/5*2 < mouseX && mouseX < width/5*3) {

@@ -1,5 +1,6 @@
 class EndGame {
-    EndGame() {}
+    EndGame() {
+    }
 
     // ゲームが終了した時の処理
     void draw() {

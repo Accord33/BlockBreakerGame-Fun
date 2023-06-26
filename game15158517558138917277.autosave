@@ -1,6 +1,5 @@
 import processing.net.*;
 import java.nio.charset.StandardCharsets;
-import ddf.minim.*;
 
 
 int win_width = 1200;
@@ -9,39 +8,30 @@ boolean key_list[] = new boolean[26];
 boolean keycodes[] = new boolean[3];
 Client client;
 String roomID = "room1";
-String user = "booo";
+String user = "boooc";
 String userstatus = "player";
 String avatar_data = "normal";
 float player_all[][] = new float[2][5];
 float deamon[] = new float[4];
-int gamestatus = 0;
+int gamestatus = 2;
 int charactorID = 0;
 Start start = new Start();
 Home home = new Home();
 Wait waiting = new Wait();
 EndGame end = new EndGame();
 Badend badend = new Badend();
-String IP = "127.0.0.1";
+String IP = "192.168.11.24";
 int PORT = 5007;
 UI ui = new UI();
 float player_pos[][] = new float[2][3];
 Ikabo ikabo;
 PImage img;
 PImage blood;
-int num = 0;
-// Minim minim;
-// AudioPlayer walk_sound;
 
 
 // 破壊可能ブロック座標
-float breakblock[][][] = {
-    {
-        {-1086,300.0,-141},
-        {-1430,-620,2048},
-        {-4136,-620.0,5558},
-        {-5325,-620,3948}
-    }
-};
+float breakblock[][][] = {{
+}};
 
 // 破壊メーター
 float breakmeter = 0;
@@ -110,7 +100,7 @@ float wallcollision_list[][] = {
 };
 
 // ゴール座標
-float goal[] = {-6977,-520,5847, 250, 200, 250};
+float goal[] = {7947, -520.0, 5830, 250, 200, 250};
 
 // objファイルのURL
 String worldObj_URL[] = {
@@ -161,8 +151,6 @@ void setup() {
     img = loadImage("picture.png");
     blood  = loadImage("blood_w_trans.png");
     ikabo = new Ikabo();
-    // minim = new Minim(this);
-    // walk_sound = minim.loadFile("audio/walk_sound.wav");
 }
 
 void draw() {
@@ -194,17 +182,7 @@ void update() {
     background(255);
 
     fill(0, 255, 10);
-    if (num > 0) {
-        pointLight(255, 255, 255, player.x, player.y, player.z);
-        num++;
-        if (num > 120) {
-            num = 0;
-        }
-    }
-    else {
-        pointLight(150, 150, 150, player.x, player.y, player.z);
-    }
-    
+    pointLight(100, 100, 100, player.x, player.y, player.z);
 
     strokeWeight(1);
 
@@ -240,7 +218,7 @@ void update() {
     if (key_num == 4) {
         if (goalarea.hit(player.x, player.y, player.z)) {
             println("脱出しました！！！");
-            gamestatus=4;
+            gamestatus=0;
         }
     }
 
@@ -283,7 +261,6 @@ void update() {
                 println(key_num+"本目の鍵を取得しました！！！");
                 breakmeter = 0;
                 blockstatus[i] = 1;
-                num = 1;
             }
         }
     }
@@ -308,9 +285,6 @@ void update() {
     if (damage == 1) { 
         ui.blood_show(player.x,player.y,player.z,player.angle[0]);
     }
-
-    // if (keyPressed) walk_sound.play();
-    // if (!(keyPressed)) stop();
 }
 
 void move() {
@@ -428,12 +402,7 @@ void mousePressed() {
             }
             break;
         case 4:
-            frameCount = -1;
-            resetMatrix();
             gamestatus = 0;
-            player.x = 600;
-            player.y = 400;
-            player.z = 0;
             break;
     }
 }
@@ -456,69 +425,63 @@ void clientEvent(Client c) {
         }
         else {
             // 文字列データをjsonデータに書き直してプレイヤーの座標に合わせる プレイヤー側
-            try{
-                JSONObject room = parseJSONObject(s);
-                
-                // JSONObject room = jsobject.getJSONObject(roomID);
-                JSONArray jsarray = room.getJSONArray("player");
+            JSONObject room = parseJSONObject(s);
+            // JSONObject room = jsobject.getJSONObject(roomID);
+            JSONArray jsarray = room.getJSONArray("player");
 
-                for (int i=0; i<jsarray.size(); i++) {
-                    String name = jsarray.getString(i, "*");
-                    JSONArray a = room.getJSONArray(jsarray.getString(i, "*"));
-                    float x = a.getFloat(0);
-                    float y = a.getFloat(1);
-                    float z = a.getFloat(2);
-                    float angle1 = a.getFloat(3);
-                    float m = a.getFloat(4);
-                    player_all[i][0] = x;
-                    player_all[i][1] = y;
-                    player_all[i][2] = z;
-                    player_all[i][3] = angle1;
-                    player_all[i][4] = m;
-                
-                    // print(x);
-                    // print(" ");
-                    // print(y);
-                    // print(" ");
-                    // println(z);
-                    player_pos[i][0] = x;
-                    player_pos[i][1] = y;
-                    player_pos[i][2] = z;
+            for (int i=0; i<jsarray.size(); i++) {
+                String name = jsarray.getString(i, "*");
+                JSONArray a = room.getJSONArray(jsarray.getString(i, "*"));
+                float x = a.getFloat(0);
+                float y = a.getFloat(1);
+                float z = a.getFloat(2);
+                float angle1 = a.getFloat(3);
+                float m = a.getFloat(4);
+                player_all[i][0] = x;
+                player_all[i][1] = y;
+                player_all[i][2] = z;
+                player_all[i][3] = angle1;
+                player_all[i][4] = m;
+            
+                // print(x);
+                // print(" ");
+                // print(y);
+                // print(" ");
+                // println(z);
+                player_pos[i][0] = x;
+                player_pos[i][1] = y;
+                player_pos[i][2] = z;
 
-                }
+            }
 
-                // 鬼側
-                String name = room.getString("deamon");
-                // println(name);
-                if (name != "") {
-                    JSONArray a = room.getJSONArray(name);
+            // 鬼側
+            String name = room.getString("deamon");
+            // println(name);
+            if (name != "") {
+                JSONArray a = room.getJSONArray(name);
 
-                    float x = a.getFloat(0);
-                    float y = a.getFloat(1);
-                    float z = a.getFloat(2);
-                    float angle1 = a.getFloat(3);
-                    deamon[0] = x;
-                    deamon[1] = y;
-                    deamon[2] = z;
-                    deamon[3] = angle1;
-                }
-                // 鍵の数
-                key_num = room.getInt("key");
-                // 壊したブロックの同期
-                JSONArray blockstatus_list = room.getJSONArray("breakblock");
-                for (int i=0;i<4;i++) {
-                    blockstatus[i] = blockstatus_list.getInt(i);
-                }
-                blockplace = room.getInt("worldID");
+                float x = a.getFloat(0);
+                float y = a.getFloat(1);
+                float z = a.getFloat(2);
+                float angle1 = a.getFloat(3);
+                deamon[0] = x;
+                deamon[1] = y;
+                deamon[2] = z;
+                deamon[3] = angle1;
+            }
+            // 鍵の数
+            key_num = room.getInt("key");
+            // 壊したブロックの同期
+            JSONArray blockstatus_list = room.getJSONArray("breakblock");
+            for (int i=0;i<4;i++) {
+                blockstatus[i] = blockstatus_list.getInt(i);
+            }
+            blockplace = room.getInt("worldID");
 
-                // プレイヤーのアバターを取得
-                JSONArray avatar_list = room.getJSONArray("Pcharactor");
-                for (int i=0; i<(avatar_list.size() - avatar.size()); i++) {
-                    avatar.add(new Avatar_obj(avatar_dic(avatar_list.getString(i, "*"))));
-                }
-                
-            }catch (Exception e) {
-                return;
+            // プレイヤーのアバターを取得
+            JSONArray avatar_list = room.getJSONArray("Pcharactor");
+            for (int i=0; i<(avatar_list.size() - avatar.size()); i++) {
+                avatar.add(new Avatar_obj(avatar_dic(avatar_list.getString(i, "*"))));
             }
         }
 
@@ -560,7 +523,3 @@ String avatar_dic(String name) {
         return "None";
     }
 }
-// void stop() {
-//   minim.stop();
-//   super.stop();
-// }
