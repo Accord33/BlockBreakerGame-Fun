@@ -21,7 +21,7 @@ Home home = new Home();
 Wait waiting = new Wait();
 EndGame end = new EndGame();
 Badend badend = new Badend();
-String IP = "127.0.0.1";
+String IP = "10.124.49.81";
 int PORT = 5007;
 UI ui = new UI();
 float player_pos[][] = new float[2][3];
@@ -29,6 +29,7 @@ Ikabo ikabo;
 PImage img;
 PImage blood;
 int num = 0;
+PImage fun;
 // Minim minim;
 // AudioPlayer walk_sound;
 
@@ -160,6 +161,7 @@ void setup() {
     textFont(font);
     img = loadImage("picture.png");
     blood  = loadImage("blood_w_trans.png");
+    fun = loadImage("IMG_5630.JPG");
     ikabo = new Ikabo();
     // minim = new Minim(this);
     // walk_sound = minim.loadFile("audio/walk_sound.wav");
@@ -202,7 +204,7 @@ void update() {
         }
     }
     else {
-        pointLight(150, 150, 150, player.x, player.y, player.z);
+        pointLight(200, 200, 200, player.x, player.y, player.z);
     }
     
 
@@ -444,6 +446,7 @@ void clientEvent(Client c) {
     if (c != null) {
         byte[] b = c.readBytes();
         s = new String(b, StandardCharsets.UTF_8);
+        // print(s);
     }
 
     if (s!=null) {
