@@ -7,16 +7,16 @@ class Avatar_obj {
     Objseq file;
     int frame = 0;
     Avatar_obj(String url) {
-        this.obj = loadShape("model/"+url+"/"+url+".obj");
-        this.file = new Objseq(32, "model/"+url+"/"+url+"/"+url+"");
+        this.obj = loadShape("../model/"+url+"/"+url+".obj");
+        this.file = new Objseq(32, "../model/"+url+"/"+url+"/"+url+"");
         this.obj.rotate(PI);
     }
 
-    void update(float x, float y, float z, float angle1, int moveing) {
+    void update(float x, float y, float z, float angle1, boolean moveing) {
         pushMatrix();
         translate(x, y+110, z);
         // translate(sin(angle1)*100+x, y+110, cos(angle1)*100+z);
-        if (moveing == 1) {
+        if (moveing) {
             this.file.models.get(this.frame).rotateY(angle1);
             scale(8000.0);
             shape(this.file.models.get(this.frame));
