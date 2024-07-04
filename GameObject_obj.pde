@@ -1,4 +1,4 @@
-// objファイルから持ってきたオブジェクトの生成  クラス
+// objファイルから持ってきたオブジェクトの生成  bんクラス
 class GameObject_obj {
     float x, y, z, angle1, angle2;
     String url;
