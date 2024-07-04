@@ -1,41 +1,6 @@
 テーマ　鬼ごっこ
-待機
-リクエスト
-{
-    "status":"wait",
-    "username":"{username}",
-    "roomID":"{}", //これ正直なしにしたい
-    "userstatus":"{userまたはdeamon}",
-    "avator":"{normal}", //キャラの設定
-}
-レスポンス
-{
-    "player_num":0,
-}
 
-
-プレイ中
-リクエスト
-{
-    "status":"play",
-    "username":"{username}",
-    "roomID":"{}", //これ指定したやつを使うか自動生成か
-    "userstatus":"{userまたはdeamon}",
-    "avatar":"{normal}",
-}
-レスポンス
-{
-    "player_num":0,
-    "players_pos": [
-        {
-            "username":"{username}",//これいるかな
-            "avator":"{normal}",
-            "x":0,
-            "y":0,
-            "z":0,
-        }
-    ]
-}
+{\"room\":\""+roomID+"\",\"user\":\""+user+"\",\"userstatus\":\""+userstatus+"\",\"pos\":["+str(player.x)+","+str(player.y)+","+str(player.z)+","+player.angle[0]+"],\"key\":"+key_num+",\"breakblock\":["+blockstatus[0]+","+blockstatus[1]+","+blockstatus[2]+","+blockstatus[3]+"],\"avatar\":\""+avatar_data+"\"}
 
 効果音
 画面のエフェクト
