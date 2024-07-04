@@ -3,47 +3,38 @@ import java.nio.charset.StandardCharsets;
 import ddf.minim.*;
 
 
+// 画面サイズ
 int win_width = 1200;
 int win_height = 800;
-boolean key_list[] = new boolean[26];
-boolean keycodes[] = new boolean[3];
-Client client;
-String roomID = "room1";
-String user = "booo";
-String userstatus = "player";
-String avatar_data = "normal";
-float player_all[][] = new float[2][5];
-float deamon[] = new float[4];
-int gamestatus = 0;
-int charactorID = 0;
+
+// 画面のインスタンス
 Start start = new Start();
 Home home = new Home();
 Wait waiting = new Wait();
 EndGame end = new EndGame();
 Badend badend = new Badend();
+UI ui = new UI();
+// サーバーアクセス系
 String IP = "127.0.0.1";
 int PORT = 5007;
-UI ui = new UI();
+Client client;
+
+// プレイヤーステータス系
+String roomID = "room1";
+String user = "booo";
+String userstatus = "player";
+String avatar_data = "normal";
 float player_pos[][] = new float[2][3];
-Ikabo ikabo;
-PImage img;
-PImage blood;
-int num = 0;
-PImage fun;
-// Minim minim;
-// AudioPlayer walk_sound;
+float player_all[][] = new float[2][5];
+float deamon[] = new float[4];
+int gamestatus = 0;
+int charactorID = 0;
 
+// プレイヤー操作系
+boolean key_list[] = new boolean[26];
+boolean keycodes[] = new boolean[3];
 
-// 破壊可能ブロック座標
-float breakblock[][][] = {
-    {
-        {-1086,300.0,-141},
-        {-1430,-620,2048},
-        {-4136,-620.0,5558},
-        {-5325,-620,3948}
-    }
-};
-
+// プレイに必要な変数系
 // 破壊メーター
 float breakmeter = 0;
 // 破壊スピード
@@ -59,6 +50,26 @@ int move_speed = 6;
 // ダメージ
 int damage = 0;
 int cooltime = 0;
+
+
+// プレイに必要なデータ系
+Ikabo ikabo;
+PImage img;
+PImage blood;
+int num = 0;
+PImage fun;
+
+
+
+// 破壊可能ブロック座標
+float breakblock[][][] = {
+    {
+        {-1086,300.0,-141},
+        {-1430,-620,2048},
+        {-4136,-620.0,5558},
+        {-5325,-620,3948}
+    }
+};
 
 
 // 当たり判定を持つ床
@@ -138,6 +149,7 @@ Player player = new Player(600, 400, 0);
 // 使う文字のUnicode ID
 int charactor[] = {'a'-'a','s'-'a','w'-'a','d'-'a'};
 
+
 // 画面サイズを変数で宣言する時はsetting関数を使わなければいけない
 public void settings() {
     size(win_width, win_height, "processing.opengl.PGraphics3D");                             
@@ -146,22 +158,31 @@ public void settings() {
 void setup() {
     // 画面サイズ変更可
     surface.setResizable( true );
-    // 可変長リストに代入
+
+    // サーバー通信系
+    client = new Client(this, IP, PORT);
+    // フォントの設定
+    PFont font = createFont("Meiryo", 50);
+    textFont(font);
+
+    // ゲームに必要なデータの読み込み
+    // ワールドを読み込み
     for (int i=0; i<worldObj.length; i++) {
         gameobject_obj.add(new GameObject_obj(worldObj[i][0], worldObj[i][1], worldObj[i][2], worldObj[i][3], worldObj[i][4], worldObj_URL[i]));
     }
+    // 床の当たり判定の読み込み
     for (int i=0; i<collision_list.length; i++) {
         collision.add(new Collision(collision_list[i][0], collision_list[i][1], collision_list[i][2], collision_list[i][3], collision_list[i][4], collision_list[i][5]));
     }
+    // 壁の当たり判定の読み込み
     for (int i=0; i<wallcollision_list.length;i++) {
         wallcollition.add(new AreaCollision(wallcollision_list[i][0], wallcollision_list[i][1], wallcollision_list[i][2], wallcollision_list[i][3], wallcollision_list[i][4], wallcollision_list[i][5]));
     }
-    client = new Client(this, IP, PORT);
-    PFont font = createFont("Meiryo", 50);
-    textFont(font);
-    img = loadImage("picture.png");
+    // 画像の読み込み
+    img = loadImage("startpic.png");
     blood  = loadImage("blood_w_trans.png");
     fun = loadImage("IMG_5630.JPG");
+    // イカボの読み込み
     ikabo = new Ikabo();
     // minim = new Minim(this);
     // walk_sound = minim.loadFile("audio/walk_sound.wav");
@@ -222,11 +243,6 @@ void update() {
 
     // 1にすると重力がなくなる
     int a = 0;
-    // print(player.x);
-    // print(" ");
-    // print(player.y);
-    // print(" ");
-    // println(player.z);
 
     // 床の当たり判定を生成
     for (Collision obj : collision) {
@@ -238,6 +254,7 @@ void update() {
         }
     }
 
+    // 鍵を4つ持っていたらゴール
     goalarea.update();
     if (key_num == 4) {
         if (goalarea.hit(player.x, player.y, player.z)) {
@@ -532,23 +549,11 @@ void clientEvent(Client c) {
 void otherplayer() {
     if (gamestatus == 3) {
         for (int i=0; i<player_all.length;i++) {
-            // pushMatrix();
-            // translate(player_all[i][0], player_all[i][1]-130, player_all[i][2]);
-            // fill(0, 0, 255);
-            // rotateY(player_all[i][3]);
-            // box(50);
-            // popMatrix();
             if (!(i >= avatar.size())) {
                 avatar.get(i).update(player_all[i][0], player_all[i][1]-130, player_all[i][2], player_all[i][3], int(player_all[i][4]));
             }
         }
 
-        // pushMatrix();
-        // translate(deamon[0], deamon[1]-130, deamon[2]);
-        // fill(255, 0, 0);
-        // rotateY(deamon[3]);
-        // box(50);
-        // popMatrix();
         ikabo.update(deamon[0], deamon[1], deamon[2], deamon[3]);
 
     }
