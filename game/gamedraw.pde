@@ -77,6 +77,7 @@ ArrayList <GameObject_obj> gameobject_obj = new ArrayList<>();
 ArrayList <Collision> collision = new ArrayList<>();
 ArrayList <AreaCollision> wallcollition = new ArrayList<>();
 // ArrayList <Avatar_obj> avatar = new ArrayList<>();
+float player_all[][] = new float[2][3];
 
 // ゴールエリアの生成
 AreaCollision goalarea = new AreaCollision(goal[0],goal[1],goal[2],goal[3],goal[4],goal[5]);
@@ -144,6 +145,24 @@ class Gamedraw {
         }
     }
     void clientEvent(Client c) {
-        
+        String s = null;
+        if (c!=null) {
+            byte[] b = c.readBytes();
+            s = new String(b, StandardCharsets.UTF_8);
+            println(s);
+        }
+
+        if (s != null) {
+            JSONObject json = JSONObject.parse(s);
+            player_all[0][0] = json.getFloat("x");
+            player_all[0][1] = json.getFloat("y");
+            player_all[0][2] = json.getFloat("z");
+
+            player_all[1][0] = json.getFloat("x");
+            player_all[1][1] = json.getFloat("y");
+            player_all[1][2] = json.getFloat("z");
+            player.avatar.update(player_all[0][0], player_all[0][1], player_all[0][2], player.angle[0], player.isMoving);
+            player.avatar.update(player_all[1][0], player_all[1][1], player_all[1][2], player.angle[0], player.isMoving);
+        }
     }
 }

@@ -108,14 +108,3 @@ class Home {
         }
     }
 }
-
-void clientEvent(Client c) {
-    switch gamestatus {
-        case 3:
-            wait.clientEvent(c);
-            break;
-        case 3:
-            gamedraw.clientEvent(c);
-            break;
-    }
-}

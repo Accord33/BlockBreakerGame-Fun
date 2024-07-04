@@ -2,6 +2,7 @@ import processing.net.*;
 import java.nio.charset.StandardCharsets;
 import ddf.minim.*;
 
+
 // 画面サイズ
 int win_width = 1200;
 int win_height = 800;
@@ -14,10 +15,10 @@ Player player;
 Gamedraw gamedraw;
 
 // ゲームのステータス(スタートかホームかプレイ中かなど)
-int gamestatus = 3;
+int gamestatus = 2;
 
 // サーバーアクセス系
-String IP = "127.0.0.1";
+String IP = "10.124.78.133";
 int PORT = 5007;
 Client client;
 
@@ -36,12 +37,14 @@ void setup() {
     PFont font = createFont("Meiryo", 50);
     textFont(font);
 
+    client = new Client(this, IP, PORT);
+
     start = new Start();
     home = new Home();
     wait = new Wait();
     player = new Player(600, 400, 0);
     gamedraw = new Gamedraw();
-    player.setting("room1", "user1", "normal", 10, "walk_man");
+    player.setting("room1", "user2", "player", 10, "walk_man");
 }
 
 void draw() {
@@ -109,5 +112,17 @@ void mousePressed() {
     case 1:
         home.mousePressed();
         break;
+    }
+}
+
+
+void clientEvent(Client c) {
+    switch (gamestatus) {
+        case 2:
+            wait.clientEvent(c);
+            break;
+        case 3:
+            gamedraw.clientEvent(c);
+            break;
     }
 }
